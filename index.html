@@ -3,277 +3,278 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Butterfield BESS Site — AR Viewer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <title>Butterfield BESS Site — Chaberton Energy AR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green: #00ff87;
-      --dark: #0a0f0d;
-      --mid: #111a14;
-      --border: rgba(0,255,135,0.15);
-      --text: #c8d8cc;
+      --navy: #1a2e4a;
+      --blue: #2d7dd2;
+      --sky: #5ba4e5;
+      --light: #f4f8fc;
+      --white: #ffffff;
+      --text: #2c3e50;
+      --muted: #6b8299;
+      --border: #d0dce8;
+      --accent: #e8f2fb;
     }
 
     body {
-      background-color: var(--dark);
+      background: var(--light);
       color: var(--text);
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Lato', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
       justify-content: center;
-      padding: 2rem;
-      overflow: hidden;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo-text { display: flex; flex-direction: column; line-height: 1; }
+    .logo-name { font-weight: 900; font-size: 1.1rem; color: var(--navy); letter-spacing: 0.04em; text-transform: uppercase; }
+    .logo-tagline { font-weight: 300; font-size: 0.6rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; }
+
+    .hero {
+      width: 100%;
+      background: linear-gradient(135deg, var(--navy) 0%, #1e3d5c 60%, #2d5f8a 100%);
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
       position: relative;
+      overflow: hidden;
     }
 
-    /* Background grid */
-    body::before {
+    .hero::before {
       content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 40px 40px;
-      z-index: 0;
-      pointer-events: none;
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle at 80% 20%, rgba(93,164,229,0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 20% 80%, rgba(93,164,229,0.1) 0%, transparent 40%);
     }
 
-    /* Radial glow */
-    body::after {
-      content: '';
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(ellipse, rgba(0,255,135,0.08) 0%, transparent 70%);
-      z-index: 0;
-      pointer-events: none;
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--sky); border: 1px solid rgba(93,164,229,0.4);
+      padding: 0.3rem 0.9rem; border-radius: 20px;
+      margin-bottom: 1.2rem; position: relative;
     }
+
+    .hero h1 {
+      font-family: 'Merriweather', serif; font-weight: 700;
+      font-size: clamp(1.6rem, 6vw, 2.2rem);
+      color: var(--white); line-height: 1.2;
+      margin-bottom: 0.6rem; position: relative;
+    }
+
+    .hero p {
+      font-size: 0.88rem; font-weight: 300; color: rgba(255,255,255,0.7);
+      max-width: 340px; margin: 0 auto; line-height: 1.6; position: relative;
+    }
+
+    main { width: 100%; max-width: 480px; padding: 2rem 1.5rem 3rem; }
 
     .card {
-      position: relative;
-      z-index: 1;
-      background: var(--mid);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      max-width: 480px;
-      width: 100%;
-      padding: 3rem 2.5rem;
-      text-align: center;
-      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+      box-shadow: 0 4px 24px rgba(26,46,74,0.08);
+      animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
+      from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .tag {
-      display: inline-block;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--green);
-      border: 1px solid var(--border);
-      padding: 0.3rem 0.8rem;
-      border-radius: 2px;
-      margin-bottom: 1.5rem;
-      animation: fadeUp 0.8s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    .card-header {
+      background: var(--accent); border-bottom: 1px solid var(--border);
+      padding: 1.2rem 1.5rem;
+      display: flex; align-items: center; gap: 0.75rem;
     }
 
-    .icon {
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 1.5rem;
-      animation: fadeUp 0.8s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+    .card-icon {
+      width: 40px; height: 40px; background: var(--blue);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
-    .icon svg {
-      width: 100%;
-      height: 100%;
+    .card-icon svg { width: 20px; height: 20px; }
+    .card-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.15rem; }
+    .card-title { font-weight: 700; font-size: 0.95rem; color: var(--navy); }
+
+    .card-body { padding: 1.5rem; }
+
+    .steps { margin-bottom: 1.5rem; }
+
+    .step {
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      padding: 0.65rem 0; border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+
+    .step-num {
+      width: 22px; height: 22px; background: var(--navy); color: white;
+      border-radius: 50%; font-size: 0.65rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
     }
 
-    h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2rem, 8vw, 2.8rem);
-      letter-spacing: 0.05em;
-      color: #fff;
-      line-height: 1;
-      margin-bottom: 0.5rem;
-      animation: fadeUp 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+    .step-text { font-size: 0.82rem; line-height: 1.5; color: var(--text); }
+    .step-text strong { color: var(--navy); font-weight: 700; }
+
+    .btn-ar {
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      width: 100%; background: var(--blue); color: white;
+      font-family: 'Lato', sans-serif; font-weight: 700;
+      font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase;
+      text-decoration: none; padding: 0.95rem 1.5rem;
+      border-radius: 6px; border: none; cursor: pointer;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 16px rgba(45,125,210,0.3);
     }
 
-    .subtitle {
-      font-size: 0.85rem;
-      font-weight: 300;
-      color: #7a9a82;
-      margin-bottom: 2.5rem;
-      letter-spacing: 0.03em;
-      animation: fadeUp 0.8s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
+    .btn-ar:hover { background: #2568b8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,125,210,0.4); }
+    .btn-ar:active { transform: translateY(0); }
+    .btn-ar svg { width: 18px; height: 18px; }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      background: var(--green);
-      color: #000;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      font-size: 0.95rem;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      padding: 1rem 2rem;
-      border-radius: 3px;
-      width: 100%;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      animation: fadeUp 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-      box-shadow: 0 0 0 0 rgba(0,255,135,0.4);
+    .btn-disabled {
+      background: var(--accent); color: var(--muted);
+      border: 1px solid var(--border); box-shadow: none; cursor: default;
     }
+    .btn-disabled:hover { background: var(--accent); transform: none; box-shadow: none; }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(0,255,135,0.25);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-    }
-
-    .btn svg {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-    }
-
-    .note {
-      margin-top: 1.5rem;
-      font-size: 0.75rem;
-      color: #4a6a52;
-      letter-spacing: 0.02em;
-      animation: fadeUp 0.8s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 2rem 0;
-    }
+    .note { margin-top: 1rem; font-size: 0.72rem; color: var(--muted); text-align: center; line-height: 1.5; }
+    .note a { color: var(--blue); text-decoration: none; }
 
     .specs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      animation: fadeUp 0.8s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+      margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
     }
 
-    .spec {
-      text-align: left;
-      background: rgba(0,255,135,0.03);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 0.75rem 1rem;
-    }
+    .spec { background: var(--accent); border: 1px solid var(--border); border-radius: 6px; padding: 0.7rem 0.9rem; }
+    .spec-label { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.2rem; }
+    .spec-value { font-size: 0.9rem; font-weight: 700; color: var(--navy); }
 
-    .spec-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #4a6a52;
-      margin-bottom: 0.25rem;
+    footer {
+      width: 100%; text-align: center; padding: 1.5rem;
+      font-size: 0.7rem; color: var(--muted);
+      border-top: 1px solid var(--border); background: var(--white); margin-top: auto;
     }
+    footer a { color: var(--blue); text-decoration: none; }
 
-    .spec-value {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--green);
-    }
-
-    /* Android-only visibility */
     .android-only { display: none; }
-    .non-android { display: block; }
-
-    @media (pointer: coarse) {
-      /* likely mobile - further JS detection handles android */
-    }
   </style>
 </head>
 <body>
 
-<div class="card">
-  <div class="tag">AR Site Model</div>
+  <header>
+    <a href="https://www.chaberton.com" class="logo-wrap" target="_blank">
+      <img src="https://www.chaberton.com/wp-content/smush-webp/2024/07/chaberton-energy.png.webp"
+           alt="Chaberton Energy"
+           style="height:36px; width:auto;"
+           onerror="this.style.display='none'; document.querySelector('.logo-text').style.display='flex';" />
+      <div class="logo-text" style="display:none;">
+        <span class="logo-name">Chaberton Energy</span>
+        <span class="logo-tagline">Creativity · Excellence · Humanity</span>
+      </div>
+    </a>
+  </header>
 
-  <div class="icon">
-    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="1" width="70" height="70" rx="3" stroke="rgba(0,255,135,0.2)" stroke-width="1"/>
-      <path d="M36 16L54 26V46L36 56L18 46V26L36 16Z" stroke="#00ff87" stroke-width="1.5" fill="rgba(0,255,135,0.05)"/>
-      <path d="M36 16V56M18 26L54 46M54 26L18 46" stroke="#00ff87" stroke-width="0.75" stroke-dasharray="3 3" opacity="0.4"/>
-      <circle cx="36" cy="36" r="3" fill="#00ff87"/>
-    </svg>
+  <div class="hero">
+    <div class="hero-tag">AR Site Model · WebXR</div>
+    <h1>Butterfield BESS Site</h1>
+    <p>Battery Energy Storage System — Interactive augmented reality site model at true 1:1 scale</p>
   </div>
 
-  <h1>Butterfield BESS Site</h1>
-  <p class="subtitle">Battery Energy Storage System — 3D Site Model</p>
+  <main>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-label">Augmented Reality</div>
+          <div class="card-title">View Model In Your Environment</div>
+        </div>
+      </div>
 
-  <!-- Android AR Button -->
-  <a id="ar-btn" class="btn android-only"
-    href="intent://arvr.google.com/scene-viewer/1.0?file=https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb&mode=ar_preferred&resizable=false&title=Butterfield%20BESS%20Site#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=https://arvr.google.com/scene-viewer?file=https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb&resizable=false;end;">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-    </svg>
-    View in Augmented Reality
-  </a>
+      <div class="card-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text"><strong>Point</strong> your camera at the ground near your reference marker</div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text"><strong>Drag</strong> with one finger to move the model</div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text"><strong>Twist</strong> two fingers to rotate the model</div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-text"><strong>Align</strong> the corner bullseye with your ground marker</div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-text"><strong>Walk around</strong> freely to inspect the site at full scale</div>
+          </div>
+        </div>
 
-  <!-- Non-Android message -->
-  <div class="non-android" id="non-android-msg">
-    <div class="btn" style="background: rgba(0,255,135,0.08); color: var(--green); cursor: default; border: 1px solid var(--border);">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-      Open on Android to View in AR
+        <a class="btn-ar android-only" id="ar-btn" href="ar.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+          Launch AR Experience
+        </a>
+
+        <div class="btn-ar btn-disabled" id="non-android-msg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Open on Android to View in AR
+        </div>
+
+        <p class="note">Requires Chrome on Android with ARCore support.</p>
+
+        <div class="specs">
+          <div class="spec"><div class="spec-label">Height</div><div class="spec-value">35 ft</div></div>
+          <div class="spec"><div class="spec-label">Length</div><div class="spec-value">~100 ft</div></div>
+          <div class="spec"><div class="spec-label">Scale</div><div class="spec-value">1 : 1</div></div>
+          <div class="spec"><div class="spec-label">Format</div><div class="spec-value">WebXR / AR</div></div>
+        </div>
+      </div>
     </div>
-    <p class="note">Scene Viewer requires an Android device with ARCore support.<br>Share this link with an Android user to experience the model in AR.</p>
-  </div>
+  </main>
 
-  <hr class="divider" />
+  <footer>
+    <p>© 2026 <a href="https://www.chaberton.com" target="_blank">Chaberton Energy</a> · Butterfield BESS Site · Confidential</p>
+  </footer>
 
-  <div class="specs">
-    <div class="spec">
-      <div class="spec-label">Height</div>
-      <div class="spec-value">35 ft</div>
-    </div>
-    <div class="spec">
-      <div class="spec-label">Scale</div>
-      <div class="spec-value">1 : 1</div>
-    </div>
-    <div class="spec">
-      <div class="spec-label">Format</div>
-      <div class="spec-value">GLB / AR</div>
-    </div>
-    <div class="spec">
-      <div class="spec-label">Platform</div>
-      <div class="spec-value">Android</div>
-    </div>
-  </div>
-
-  <p class="note" style="margin-top:1.2rem;">Tap the button above to place the model at true scale in your environment.</p>
-</div>
-
-<script>
-  const isAndroid = /android/i.test(navigator.userAgent);
-  if (isAndroid) {
-    document.querySelectorAll('.android-only').forEach(el => el.style.display = 'inline-flex');
-    document.querySelectorAll('.non-android').forEach(el => el.style.display = 'none');
-  }
-</script>
+  <script>
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isAndroid) {
+      document.getElementById('ar-btn').style.display = 'flex';
+      document.getElementById('non-android-msg').style.display = 'none';
+    }
+  </script>
 
 </body>
 </html>

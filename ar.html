@@ -3,143 +3,152 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Butterfield BESS — AR Viewer</title>
+  <title>Butterfield BESS — AR View | Chaberton Energy</title>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green: #00ff87;
-      --dark: #0a0f0d;
-      --mid: #111a14;
-      --border: rgba(0,255,135,0.15);
-      --text: #c8d8cc;
+      --navy: #1a2e4a;
+      --blue: #2d7dd2;
+      --sky: #5ba4e5;
+      --light: #f4f8fc;
+      --white: #ffffff;
+      --text: #2c3e50;
+      --muted: #6b8299;
+      --border: #d0dce8;
+      --accent: #e8f2fb;
     }
 
     html, body {
       width: 100%; height: 100%;
-      background: var(--dark);
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text);
+      background: var(--navy);
+      font-family: 'Lato', sans-serif;
       overflow: hidden;
     }
 
     /* ── Launch screen ── */
     #launch {
       position: fixed; inset: 0; z-index: 100;
-      background: var(--dark);
+      background: var(--light);
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 2rem;
       transition: opacity 0.5s ease;
+      overflow-y: auto;
     }
 
-    #launch::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
+    .launch-header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
     }
 
-    #launch::after {
-      content: '';
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 500px; height: 500px;
-      background: radial-gradient(ellipse, rgba(0,255,135,0.08) 0%, transparent 70%);
-      pointer-events: none;
+    .back-link {
+      font-size: 0.78rem; color: var(--blue);
+      text-decoration: none; font-weight: 700;
+      display: flex; align-items: center; gap: 0.3rem;
     }
 
-    .launch-card {
-      position: relative; z-index: 1;
-      background: var(--mid);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      max-width: 420px; width: 100%;
-      padding: 2.5rem 2rem;
+    .launch-hero {
+      background: linear-gradient(135deg, var(--navy) 0%, #1e3d5c 60%, #2d5f8a 100%);
+      padding: 2.5rem 1.5rem 2rem;
       text-align: center;
-      animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both;
+      position: relative; overflow: hidden;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .launch-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(circle at 80% 20%, rgba(93,164,229,0.15) 0%, transparent 50%);
     }
 
     .launch-tag {
-      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--green); border: 1px solid var(--border);
-      padding: 0.25rem 0.7rem; border-radius: 2px;
-      display: inline-block; margin-bottom: 1.2rem;
+      display: inline-block; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--sky); border: 1px solid rgba(93,164,229,0.4);
+      padding: 0.25rem 0.8rem; border-radius: 20px;
+      margin-bottom: 1rem; position: relative;
     }
 
-    .launch-icon {
-      width: 60px; height: 60px; margin: 0 auto 1.2rem;
+    .launch-hero h1 {
+      font-family: 'Merriweather', serif; font-weight: 700;
+      font-size: 1.6rem; color: var(--white);
+      line-height: 1.2; margin-bottom: 0.4rem; position: relative;
     }
 
-    .launch-icon svg { width: 100%; height: 100%; }
-
-    h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.2rem; letter-spacing: 0.05em;
-      color: #fff; line-height: 1; margin-bottom: 0.4rem;
+    .launch-hero p {
+      font-size: 0.8rem; font-weight: 300;
+      color: rgba(255,255,255,0.65);
+      position: relative;
     }
 
-    .launch-sub {
-      font-size: 0.8rem; font-weight: 300; color: #7a9a82;
-      margin-bottom: 2rem; letter-spacing: 0.02em;
+    .launch-body {
+      padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem;
+      max-width: 480px; width: 100%; margin: 0 auto;
     }
 
-    .instructions {
-      background: rgba(0,255,135,0.03);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 1rem 1.2rem;
-      margin-bottom: 1.5rem;
-      text-align: left;
+    .steps-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(26,46,74,0.06);
     }
 
-    .instructions p {
-      font-size: 0.78rem; color: #7a9a82;
-      line-height: 1.7; margin: 0;
+    .steps-header {
+      background: var(--accent); border-bottom: 1px solid var(--border);
+      padding: 0.8rem 1.2rem;
+      font-size: 0.65rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--muted); font-weight: 700;
     }
 
-    .instructions strong { color: var(--green); font-weight: 500; }
+    .step {
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      padding: 0.65rem 1.2rem; border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+
+    .step-num {
+      width: 20px; height: 20px; background: var(--navy); color: white;
+      border-radius: 50%; font-size: 0.6rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    .step-text { font-size: 0.8rem; line-height: 1.5; color: var(--text); }
+    .step-text strong { color: var(--navy); font-weight: 700; }
 
     .launch-btn {
-      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-      background: var(--green); color: #000;
-      font-family: 'DM Sans', sans-serif; font-weight: 500;
-      font-size: 0.9rem; letter-spacing: 0.04em;
-      border: none; border-radius: 3px;
-      width: 100%; padding: 0.9rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      background: var(--blue); color: white;
+      font-family: 'Lato', sans-serif; font-weight: 700;
+      font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase;
+      border: none; border-radius: 6px;
+      width: 100%; padding: 1rem;
       cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 16px rgba(45,125,210,0.3);
     }
 
-    .launch-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,255,135,0.2); }
+    .launch-btn:hover { background: #2568b8; transform: translateY(-1px); }
     .launch-btn:active { transform: translateY(0); }
-
-    .launch-btn svg { width: 16px; height: 16px; }
+    .launch-btn svg { width: 18px; height: 18px; }
 
     .launch-note {
-      margin-top: 1rem; font-size: 0.7rem; color: #4a6a52;
+      font-size: 0.7rem; color: var(--muted);
+      text-align: center; line-height: 1.5;
+      padding-bottom: 1rem;
     }
 
     /* ── Model Viewer ── */
     model-viewer {
       width: 100%; height: 100%;
       position: fixed; inset: 0;
-      --poster-color: transparent;
       background-color: transparent;
+      --poster-color: transparent;
+      display: none;
     }
 
-    /* ── AR overlay UI ── */
+    /* ── AR Overlay UI ── */
     #ar-ui {
       display: none;
       position: fixed; inset: 0; z-index: 10;
@@ -148,196 +157,204 @@
 
     #ar-ui.visible { display: block; }
 
-    /* Top bar */
     .ar-topbar {
       position: absolute; top: 0; left: 0; right: 0;
-      padding: 1rem 1.2rem;
+      padding: 0.8rem 1.2rem;
       display: flex; align-items: center; justify-content: space-between;
       pointer-events: auto;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
     }
 
-    .ar-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem; letter-spacing: 0.08em;
-      color: #fff;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+    .ar-logo {
+      height: 22px; width: auto;
     }
 
     .ar-badge {
       font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--green); background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(0,255,135,0.3);
-      padding: 0.2rem 0.6rem; border-radius: 2px;
+      color: #5ba4e5; background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(93,164,229,0.3);
+      padding: 0.2rem 0.6rem; border-radius: 3px;
+      font-family: 'Lato', sans-serif;
     }
 
-    /* Hint pill */
     .ar-hint {
-      position: absolute; bottom: 5rem; left: 50%; transform: translateX(-50%);
-      background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,135,0.2);
-      border-radius: 20px; padding: 0.5rem 1.1rem;
-      font-size: 0.72rem; color: #c8d8cc; white-space: nowrap;
-      text-align: center;
+      position: absolute; bottom: 5.5rem; left: 50%; transform: translateX(-50%);
+      background: rgba(26,46,74,0.85); border: 1px solid rgba(93,164,229,0.3);
+      border-radius: 20px; padding: 0.5rem 1.2rem;
+      font-size: 0.72rem; color: rgba(255,255,255,0.9);
+      white-space: nowrap; text-align: center;
+      font-family: 'Lato', sans-serif;
       transition: opacity 0.5s;
       pointer-events: none;
     }
 
-    /* Exit button */
     .ar-exit {
       position: absolute; bottom: 1.5rem; right: 1.2rem;
-      background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.15);
-      color: #fff; border-radius: 3px;
-      font-family: 'DM Sans', sans-serif; font-size: 0.75rem;
+      background: rgba(26,46,74,0.85); border: 1px solid rgba(93,164,229,0.3);
+      color: white; border-radius: 6px;
+      font-family: 'Lato', sans-serif; font-weight: 700;
+      font-size: 0.72rem; letter-spacing: 0.05em;
       padding: 0.5rem 1rem; cursor: pointer;
       pointer-events: auto;
-      letter-spacing: 0.05em;
     }
 
-    /* Non-android fallback */
+    /* Not Android */
     #not-android {
-      display: none;
-      position: fixed; inset: 0; z-index: 200;
-      background: var(--dark);
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: var(--light);
       align-items: center; justify-content: center;
-      flex-direction: column; padding: 2rem; text-align: center;
+      flex-direction: column; padding: 2rem; text-align: center; gap: 1rem;
     }
 
     #not-android h2 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem; color: #fff; margin-bottom: 0.5rem;
+      font-family: 'Merriweather', serif;
+      font-size: 1.5rem; color: var(--navy);
     }
 
-    #not-android p { font-size: 0.85rem; color: #7a9a82; max-width: 300px; }
+    #not-android p { font-size: 0.85rem; color: var(--muted); max-width: 300px; line-height: 1.6; }
+    #not-android a { color: var(--blue); font-weight: 700; }
   </style>
 </head>
 <body>
 
-<!-- Non-Android message -->
-<div id="not-android">
-  <div class="launch-tag">Android Required</div>
-  <h2>AR Not Available</h2>
-  <p>This experience requires an Android device with Chrome and ARCore support. Please open this link on your Android phone.</p>
-</div>
+  <!-- Not Android -->
+  <div id="not-android">
+    <img src="https://www.chaberton.com/wp-content/smush-webp/2024/07/chaberton-energy.png.webp"
+         alt="Chaberton Energy" style="height:40px; width:auto; margin-bottom:0.5rem;"
+         onerror="this.style.display='none'" />
+    <h2>Android Required</h2>
+    <p>This AR experience requires Chrome on an Android device with ARCore support.<br><br>
+      <a href="index.html">← Back to project page</a></p>
+  </div>
 
-<!-- Launch screen -->
-<div id="launch">
-  <div class="launch-card">
-    <div class="launch-tag">WebXR · AR Site Model</div>
-    <div class="launch-icon">
-      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M30 8L52 20V44L30 56L8 44V20L30 8Z" stroke="#00ff87" stroke-width="1.5" fill="rgba(0,255,135,0.05)"/>
-        <path d="M30 8V56M8 20L52 44M52 20L8 44" stroke="#00ff87" stroke-width="0.75" stroke-dasharray="3 3" opacity="0.4"/>
-        <circle cx="30" cy="30" r="3" fill="#00ff87"/>
-        <circle cx="8" cy="20" r="2.5" fill="rgba(0,255,135,0.5)"/>
-      </svg>
-    </div>
-    <h1>Butterfield BESS</h1>
-    <p class="launch-sub">Battery Energy Storage System · AR Site Model</p>
-
-    <div class="instructions">
-      <p>
-        <strong>① Point</strong> camera at the ground near your marker<br>
-        <strong>② Drag</strong> with one finger to move the model<br>
-        <strong>③ Twist</strong> two fingers to rotate<br>
-        <strong>④ Align</strong> the corner bullseye with your ground marker<br>
-        <strong>⑤ Walk</strong> around freely to inspect
-      </p>
+  <!-- Launch screen -->
+  <div id="launch">
+    <div class="launch-header">
+      <a href="index.html" class="back-link">← Back</a>
+      <img src="https://www.chaberton.com/wp-content/smush-webp/2024/07/chaberton-energy.png.webp"
+           alt="Chaberton Energy" style="height:28px; width:auto;"
+           onerror="this.style.display='none'" />
+      <div style="width:48px;"></div>
     </div>
 
-    <button class="launch-btn" id="launch-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-      </svg>
-      Launch AR
-    </button>
-    <p class="launch-note">Requires Chrome on Android with ARCore</p>
+    <div class="launch-hero">
+      <div class="launch-tag">WebXR · Augmented Reality</div>
+      <h1>Butterfield BESS Site</h1>
+      <p>True 1:1 scale · No shadows · Translate &amp; rotate</p>
+    </div>
+
+    <div class="launch-body">
+      <div class="steps-card">
+        <div class="steps-header">How to Use</div>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>Point</strong> your camera at the ground near your reference marker</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text"><strong>Drag</strong> with one finger to move the model</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>Twist</strong> two fingers to rotate the model</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text"><strong>Align</strong> the corner bullseye with your ground marker</div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-text"><strong>Walk around</strong> freely to inspect the full site</div>
+        </div>
+      </div>
+
+      <button class="launch-btn" id="launch-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        Launch AR
+      </button>
+
+      <p class="launch-note">Camera and motion permissions required.<br>Point at a flat surface to begin.</p>
+    </div>
   </div>
-</div>
 
-<!-- AR overlay UI (shown during AR session) -->
-<div id="ar-ui">
-  <div class="ar-topbar">
-    <span class="ar-title">Butterfield BESS</span>
-    <span class="ar-badge">● LIVE AR</span>
+  <!-- AR Overlay UI -->
+  <div id="ar-ui">
+    <div class="ar-topbar">
+      <img src="https://www.chaberton.com/wp-content/smush-webp/2024/07/chaberton-energy.png.webp"
+           alt="Chaberton Energy" class="ar-logo"
+           onerror="this.style.display='none'" />
+      <span class="ar-badge">● LIVE AR</span>
+    </div>
+    <div class="ar-hint" id="ar-hint">Drag to move · Twist to rotate</div>
+    <button class="ar-exit" id="ar-exit">✕ Exit AR</button>
   </div>
-  <div class="ar-hint" id="ar-hint">Drag to move · Twist to rotate</div>
-  <button class="ar-exit" id="ar-exit">✕ Exit AR</button>
-</div>
 
-<!-- Model Viewer -->
-<model-viewer
-  id="mv"
-  src="https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb"
-  ar
-  ar-modes="webxr"
-  ar-scale="fixed"
-  shadow-intensity="0"
-  shadow-softness="0"
-  exposure="1"
-  camera-controls
-  touch-action="pan-y"
-  style="display:none;"
->
-  <!-- Custom AR prompt button (hidden, triggered programmatically) -->
-  <button slot="ar-button" id="ar-button" style="display:none;"></button>
-</model-viewer>
+  <!-- Model Viewer -->
+  <model-viewer
+    id="mv"
+    src="https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb"
+    ar
+    ar-modes="webxr"
+    ar-scale="fixed"
+    shadow-intensity="0"
+    shadow-softness="0"
+    exposure="1"
+    camera-controls
+  >
+    <button slot="ar-button" style="display:none;"></button>
+  </model-viewer>
 
-<script>
-  const isAndroid = /android/i.test(navigator.userAgent);
+  <script>
+    const isAndroid = /android/i.test(navigator.userAgent);
 
-  if (!isAndroid) {
-    document.getElementById('not-android').style.display = 'flex';
-    document.getElementById('launch').style.display = 'none';
-  }
-
-  const mv = document.getElementById('mv');
-  const launch = document.getElementById('launch');
-  const arUI = document.getElementById('ar-ui');
-  const arHint = document.getElementById('ar-hint');
-  const launchBtn = document.getElementById('launch-btn');
-  const arExit = document.getElementById('ar-exit');
-
-  // Show model-viewer (hidden until needed to avoid poster flash)
-  mv.style.display = 'block';
-
-  launchBtn.addEventListener('click', () => {
-    // Trigger AR
-    mv.activateAR();
-  });
-
-  // When AR session starts
-  mv.addEventListener('ar-status', (e) => {
-    if (e.detail.status === 'session-started') {
-      launch.style.opacity = '0';
-      setTimeout(() => launch.style.display = 'none', 500);
-      arUI.classList.add('visible');
-
-      // Fade out hint after 5 seconds
-      setTimeout(() => {
-        arHint.style.opacity = '0';
-      }, 5000);
+    if (!isAndroid) {
+      document.getElementById('not-android').style.display = 'flex';
+      document.getElementById('launch').style.display = 'none';
     }
 
-    if (e.detail.status === 'not-presenting') {
-      // AR ended
+    const mv = document.getElementById('mv');
+    const launch = document.getElementById('launch');
+    const arUI = document.getElementById('ar-ui');
+    const arHint = document.getElementById('ar-hint');
+    const launchBtn = document.getElementById('launch-btn');
+    const arExit = document.getElementById('ar-exit');
+
+    mv.style.display = 'block';
+
+    launchBtn.addEventListener('click', () => {
+      mv.activateAR();
+    });
+
+    mv.addEventListener('ar-status', (e) => {
+      if (e.detail.status === 'session-started') {
+        launch.style.opacity = '0';
+        setTimeout(() => launch.style.display = 'none', 500);
+        arUI.classList.add('visible');
+        setTimeout(() => { arHint.style.opacity = '0'; }, 5000);
+      }
+
+      if (e.detail.status === 'not-presenting') {
+        arUI.classList.remove('visible');
+        launch.style.display = 'flex';
+        launch.style.opacity = '1';
+        arHint.style.opacity = '1';
+      }
+
+      if (e.detail.status === 'failed') {
+        alert('AR failed to start. Make sure ARCore is installed and camera permission is granted.');
+      }
+    });
+
+    arExit.addEventListener('click', () => {
+      mv.exitPresentationMode?.();
       arUI.classList.remove('visible');
       launch.style.display = 'flex';
       launch.style.opacity = '1';
       arHint.style.opacity = '1';
-    }
-
-    if (e.detail.status === 'failed') {
-      alert('AR session failed to start. Make sure ARCore is installed and permissions are granted.');
-    }
-  });
-
-  arExit.addEventListener('click', () => {
-    mv.exitPresentationMode?.();
-    arUI.classList.remove('visible');
-    launch.style.display = 'flex';
-    launch.style.opacity = '1';
-    arHint.style.opacity = '1';
-  });
-</script>
+    });
+  </script>
 
 </body>
 </html>
