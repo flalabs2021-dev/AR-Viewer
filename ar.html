@@ -4,21 +4,79 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Butterfield BESS — AR | Chaberton Energy</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet" />
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #000; font-family: 'Lato', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
+    html, body { width: 100%; height: 100%; background: #0a0f1a; font-family: 'Lato', sans-serif; overflow: hidden; }
 
-    #overlay {
-      position: fixed; inset: 0; z-index: 10; pointer-events: none;
+    model-viewer {
+      width: 100%; height: 100%;
+      position: fixed; inset: 0;
+      --poster-color: transparent;
+      background-color: transparent;
     }
 
-    /* Top bar */
+    /* Loading screen shown until model is ready */
+    #loading {
+      position: fixed; inset: 0; z-index: 50;
+      background: #0a0f1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem; color: white; text-align: center; padding: 2rem;
+      transition: opacity 0.5s;
+    }
+
+    #loading img { height: 36px; width: auto; margin-bottom: 0.5rem; }
+    #loading p { font-size: 0.85rem; color: rgba(255,255,255,0.6); max-width: 260px; line-height: 1.6; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(245,184,0,0.2);
+      border-top-color: #f5b800;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Ready screen - shown after model loads, before AR starts */
+    #ready {
+      display: none;
+      position: fixed; inset: 0; z-index: 40;
+      background: #0a0f1a;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.2rem; padding: 2rem; text-align: center;
+    }
+
+    #ready img { height: 36px; width: auto; }
+    #ready h2 { font-size: 1.2rem; color: white; font-weight: 700; }
+    #ready p { font-size: 0.82rem; color: rgba(255,255,255,0.6); max-width: 280px; line-height: 1.6; }
+
+    #start-ar-btn {
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      background: #f5b800; color: #1e2d4a;
+      font-family: 'Lato', sans-serif; font-weight: 900;
+      font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase;
+      border: none; border-radius: 6px;
+      padding: 1rem 2rem; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(245,184,0,0.3);
+    }
+
+    /* AR overlay */
+    #ar-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 30;
+      pointer-events: none;
+    }
+
+    #ar-overlay.visible { display: block; }
+
     #topbar {
       position: absolute; top: 0; left: 0; right: 0;
       padding: 0.8rem 1.2rem;
       display: flex; align-items: center; justify-content: space-between;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent);
       pointer-events: auto;
     }
 
@@ -31,16 +89,14 @@
       padding: 0.2rem 0.6rem; border-radius: 3px;
     }
 
-    /* Hint pill */
     #hint {
       position: absolute; bottom: 6rem; left: 50%; transform: translateX(-50%);
       background: rgba(30,45,74,0.92); border: 1px solid rgba(245,184,0,0.35);
       border-radius: 20px; padding: 0.55rem 1.3rem;
-      font-size: 0.78rem; color: #fff; white-space: nowrap;
-      transition: opacity 0.5s; text-align: center;
+      font-size: 0.75rem; color: white; white-space: nowrap;
+      transition: opacity 0.5s;
     }
 
-    /* Exit button */
     #exit-btn {
       position: absolute; bottom: 1.5rem; right: 1.2rem;
       background: rgba(30,45,74,0.92); border: 1px solid rgba(245,184,0,0.35);
@@ -48,289 +104,105 @@
       font-family: 'Lato', sans-serif; font-weight: 700; font-size: 0.72rem;
       padding: 0.55rem 1.1rem; cursor: pointer; pointer-events: auto;
     }
-
-    /* Loading screen */
-    #loading {
-      position: fixed; inset: 0; z-index: 50;
-      background: #0a0f1a;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 1rem;
-      color: white; text-align: center; padding: 2rem;
-    }
-
-    #loading img { height: 36px; width: auto; margin-bottom: 0.5rem; }
-    #loading p { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
-
-    .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid rgba(245,184,0,0.2);
-      border-top-color: #f5b800;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Not supported screen */
-    #not-supported {
-      display: none; position: fixed; inset: 0; z-index: 60;
-      background: #f4f7fa;
-      flex-direction: column; align-items: center; justify-content: center;
-      gap: 1rem; padding: 2rem; text-align: center;
-    }
-    #not-supported img { height: 36px; width: auto; }
-    #not-supported h2 { font-size: 1.3rem; color: #1e2d4a; }
-    #not-supported p { font-size: 0.85rem; color: #6b8299; max-width: 280px; line-height: 1.6; }
-    #not-supported a { color: #1e2d4a; font-weight: 700; }
   </style>
 </head>
 <body>
 
-<!-- Loading -->
+<!-- Loading screen -->
 <div id="loading">
   <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
   <div class="spinner"></div>
-  <p>Loading model…</p>
+  <p>Loading model…<br>This may take a moment on first load.</p>
 </div>
 
-<!-- Not supported -->
-<div id="not-supported">
+<!-- Ready screen (after model loads) -->
+<div id="ready">
   <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
-  <h2>AR Not Available</h2>
-  <p>WebXR with hit-testing is required. Please open this in Chrome on a supported Android device with ARCore installed.</p>
-  <p><a href="index.html">← Back</a></p>
+  <h2>Model Ready</h2>
+  <p>Point your camera at the ground near your reference marker, then tap Launch to place the model.</p>
+  <button id="start-ar-btn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>
+    Launch AR
+  </button>
 </div>
 
-<!-- AR Overlay UI -->
-<div id="overlay" style="display:none;">
+<!-- AR overlay -->
+<div id="ar-overlay">
   <div id="topbar">
     <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
     <span id="live-badge">● LIVE AR</span>
   </div>
-  <div id="hint">Point camera at the ground · Tap to place</div>
+  <div id="hint">Drag to move · Twist two fingers to rotate</div>
   <button id="exit-btn">✕ Exit AR</button>
 </div>
 
-<!-- WebGL canvas -->
-<canvas id="canvas" style="position:fixed;inset:0;width:100%;height:100%;"></canvas>
+<!-- Model viewer (invisible until AR starts) -->
+<model-viewer
+  id="mv"
+  src="Butterfield%20BESS%20Site%20FINAL.glb"
+  ar
+  ar-modes="webxr"
+  ar-scale="fixed"
+  shadow-intensity="0"
+  shadow-softness="0"
+  style="position:fixed; width:1px; height:1px; opacity:0; pointer-events:none; top:0; left:0;">
+  <button slot="ar-button" id="ar-btn" style="display:none;"></button>
+</model-viewer>
 
-<script type="module">
-  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
-  import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/GLTFLoader.js';
-
-  const MODEL_URL = 'https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb';
-
+<script>
+  const mv = document.getElementById('mv');
   const loading = document.getElementById('loading');
-  const notSupported = document.getElementById('not-supported');
-  const overlay = document.getElementById('overlay');
+  const ready = document.getElementById('ready');
+  const arOverlay = document.getElementById('ar-overlay');
   const hint = document.getElementById('hint');
+  const startArBtn = document.getElementById('start-ar-btn');
   const exitBtn = document.getElementById('exit-btn');
-  const canvas = document.getElementById('canvas');
 
-  // Check WebXR support
-  if (!navigator.xr) {
-    loading.style.display = 'none';
-    notSupported.style.display = 'flex';
-    throw new Error('WebXR not supported');
-  }
-
-  const supported = await navigator.xr.isSessionSupported('immersive-ar');
-  if (!supported) {
-    loading.style.display = 'none';
-    notSupported.style.display = 'flex';
-    throw new Error('immersive-ar not supported');
-  }
-
-  // Three.js setup
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.xr.enabled = true;
-  renderer.shadowMap.enabled = false;
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 1000);
-
-  // Lighting - no shadows
-  const ambient = new THREE.AmbientLight(0xffffff, 1.2);
-  scene.add(ambient);
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  dirLight.position.set(5, 10, 5);
-  dirLight.castShadow = false;
-  scene.add(dirLight);
-
-  // Reticle (placement ring)
-  const reticleGeo = new THREE.RingGeometry(0.12, 0.15, 32);
-  reticleGeo.rotateX(-Math.PI / 2);
-  const reticleMat = new THREE.MeshBasicMaterial({ color: 0xf5b800, side: THREE.DoubleSide });
-  const reticle = new THREE.Mesh(reticleGeo, reticleMat);
-  reticle.visible = false;
-  scene.add(reticle);
-
-  // Inner dot of reticle
-  const dotGeo = new THREE.CircleGeometry(0.04, 32);
-  dotGeo.rotateX(-Math.PI / 2);
-  const dot = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0xf5b800, side: THREE.DoubleSide }));
-  reticle.add(dot);
-
-  // Model container
-  const modelGroup = new THREE.Group();
-  modelGroup.visible = false;
-  scene.add(modelGroup);
-
-  // Load GLB
-  const loader = new GLTFLoader();
-  let modelLoaded = false;
-
-  loader.load(MODEL_URL, (gltf) => {
-    const model = gltf.scene;
-    // Disable all shadows
-    model.traverse(node => {
-      if (node.isMesh) {
-        node.castShadow = false;
-        node.receiveShadow = false;
-      }
-    });
-    modelGroup.add(model);
-    modelLoaded = true;
-    loading.style.display = 'none';
-  }, undefined, (err) => {
-    console.error('Model load error:', err);
-    loading.querySelector('p').textContent = 'Failed to load model. Check your connection.';
+  // When model finishes loading, show ready screen
+  mv.addEventListener('load', () => {
+    loading.style.opacity = '0';
+    setTimeout(() => {
+      loading.style.display = 'none';
+      ready.style.display = 'flex';
+    }, 500);
   });
 
-  // XR session state
-  let xrSession = null;
-  let hitTestSource = null;
-  let hitTestSourceRequested = false;
-  let placed = false;
-  let reticleMatrix = new THREE.Matrix4();
-
-  // Touch handling for move/rotate after placement
-  let lastTouchX = 0;
-  let lastTouchDist = 0;
-  let isTwoFinger = false;
-
-  canvas.addEventListener('touchstart', (e) => {
-    if (!placed) return;
-    if (e.touches.length === 2) {
-      isTwoFinger = true;
-      lastTouchDist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      lastTouchX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-    } else if (e.touches.length === 1) {
-      isTwoFinger = false;
-      lastTouchX = e.touches[0].clientX;
+  // Timeout fallback
+  setTimeout(() => {
+    if (loading.style.display !== 'none') {
+      loading.querySelector('p').textContent = 'Taking longer than expected… check your connection and try reloading.';
+      loading.querySelector('.spinner').style.display = 'none';
     }
-  }, { passive: true });
+  }, 25000);
 
-  canvas.addEventListener('touchmove', (e) => {
-    if (!placed) return;
-    if (e.touches.length === 2 && isTwoFinger) {
-      // Rotate with two fingers
-      const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-      const deltaX = currentX - lastTouchX;
-      modelGroup.rotation.y += deltaX * 0.01;
-      lastTouchX = currentX;
+  // Launch AR when user is ready
+  startArBtn.addEventListener('click', () => {
+    ready.style.display = 'none';
+    mv.activateAR();
+  });
+
+  // AR session events
+  mv.addEventListener('ar-status', (e) => {
+    if (e.detail.status === 'session-started') {
+      arOverlay.classList.add('visible');
+      setTimeout(() => { hint.style.opacity = '0'; }, 5000);
     }
-  }, { passive: true });
-
-  // Start AR session
-  async function startAR() {
-    xrSession = await navigator.xr.requestSession('immersive-ar', {
-      requiredFeatures: ['hit-test'],
-      optionalFeatures: ['dom-overlay'],
-      domOverlay: { root: overlay }
-    });
-
-    renderer.xr.setReferenceSpaceType('local');
-    await renderer.xr.setSession(xrSession);
-
-    overlay.style.display = 'block';
-    hint.style.opacity = '1';
-    hint.textContent = 'Point camera at the ground · Tap to place';
-
-    xrSession.addEventListener('end', () => {
-      xrSession = null;
-      hitTestSource = null;
-      hitTestSourceRequested = false;
-      placed = false;
-      modelGroup.visible = false;
-      reticle.visible = false;
-      overlay.style.display = 'none';
+    if (e.detail.status === 'not-presenting') {
+      arOverlay.classList.remove('visible');
       window.location.href = 'index.html';
-    });
-
-    // Tap to place
-    xrSession.addEventListener('select', () => {
-      if (!modelLoaded) return;
-      if (!placed && reticle.visible) {
-        // First placement
-        modelGroup.position.setFromMatrixPosition(reticleMatrix);
-        modelGroup.visible = true;
-        placed = true;
-        reticle.visible = false;
-        hint.textContent = 'Drag to move · Twist two fingers to rotate';
-        setTimeout(() => { hint.style.opacity = '0'; }, 4000);
-      } else if (placed) {
-        // Move to new location on tap
-        modelGroup.position.setFromMatrixPosition(reticleMatrix);
-        reticle.visible = false;
-      }
-    });
-
-    renderer.setAnimationLoop(render);
-  }
-
-  function render(timestamp, frame) {
-    if (!frame) return;
-
-    const referenceSpace = renderer.xr.getReferenceSpace();
-    const session = renderer.xr.getSession();
-
-    // Set up hit test source
-    if (!hitTestSourceRequested) {
-      session.requestReferenceSpace('viewer').then((viewerSpace) => {
-        session.requestHitTestSource({ space: viewerSpace }).then((source) => {
-          hitTestSource = source;
-        });
-      });
-      hitTestSourceRequested = true;
     }
-
-    // Update reticle from hit test
-    if (hitTestSource) {
-      const hitTestResults = frame.getHitTestResults(hitTestSource);
-      if (hitTestResults.length > 0) {
-        const hit = hitTestResults[0];
-        const pose = hit.getPose(referenceSpace);
-        reticleMatrix.fromArray(pose.transform.matrix);
-        reticle.visible = true;
-        reticle.position.setFromMatrixPosition(reticleMatrix);
-        reticle.quaternion.setFromRotationMatrix(reticleMatrix);
-
-        // Move placed model if dragging (single touch after placement)
-        if (placed) {
-          // Keep reticle hidden after placement unless re-tapping
-          reticle.visible = false;
-        }
-      } else {
-        if (!placed) reticle.visible = false;
-      }
+    if (e.detail.status === 'failed') {
+      alert('AR failed to start. Make sure ARCore is installed and camera permission is granted.');
+      window.location.href = 'index.html';
     }
+  });
 
-    renderer.render(scene, camera);
-  }
-
-  // Exit button
-  exitBtn.addEventListener('click', async () => {
-    if (xrSession) await xrSession.end();
+  exitBtn.addEventListener('click', () => {
+    mv.exitPresentationMode?.();
     window.location.href = 'index.html';
   });
-
-  // Auto-start AR
-  await startAR();
 </script>
 </body>
 </html>
