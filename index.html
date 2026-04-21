@@ -302,7 +302,11 @@
   const arHint = document.getElementById('ar-hint');
 
   mv.addEventListener('ar-status', (e) => {
-    if (e.detail.status === 'session-started') {
+    if (e.detail.status === "session-started") {
+      // Show which AR mode was actually used
+      const mode = mv.getAttribute("ar-modes");
+      console.log("AR mode:", e.detail);
+      document.getElementById("ar-hint").textContent = "Mode: " + JSON.stringify(e.detail);
       arUI.style.display = 'block';
       setTimeout(() => { arHint.style.opacity = '0'; }, 5000);
     }
