@@ -4,205 +4,279 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Butterfield BESS — AR | Chaberton Energy</title>
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; background: #0a0f1a; font-family: 'Lato', sans-serif; overflow: hidden; }
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; }
 
-    model-viewer {
-      width: 100%; height: 100%;
-      position: fixed; inset: 0;
-      --poster-color: transparent;
-      background-color: transparent;
-    }
-
-    /* Loading screen shown until model is ready */
-    #loading {
-      position: fixed; inset: 0; z-index: 50;
-      background: #0a0f1a;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 1rem; color: white; text-align: center; padding: 2rem;
-      transition: opacity 0.5s;
-    }
-
-    #loading img { height: 36px; width: auto; margin-bottom: 0.5rem; }
-    #loading p { font-size: 0.85rem; color: rgba(255,255,255,0.6); max-width: 260px; line-height: 1.6; }
-
-    .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid rgba(245,184,0,0.2);
-      border-top-color: #f5b800;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Ready screen - shown after model loads, before AR starts */
-    #ready {
-      display: none;
-      position: fixed; inset: 0; z-index: 40;
-      background: #0a0f1a;
-      flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 1.2rem; padding: 2rem; text-align: center;
-    }
-
-    #ready img { height: 36px; width: auto; }
-    #ready h2 { font-size: 1.2rem; color: white; font-weight: 700; }
-    #ready p { font-size: 0.82rem; color: rgba(255,255,255,0.6); max-width: 280px; line-height: 1.6; }
-
-    #start-ar-btn {
-      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
-      background: #f5b800; color: #1e2d4a;
-      font-family: 'Lato', sans-serif; font-weight: 900;
-      font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase;
-      border: none; border-radius: 6px;
-      padding: 1rem 2rem; cursor: pointer;
-      box-shadow: 0 4px 20px rgba(245,184,0,0.3);
-    }
-
-    /* AR overlay */
-    #ar-overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 30;
-      pointer-events: none;
-    }
-
-    #ar-overlay.visible { display: block; }
+    #ui { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
 
     #topbar {
       position: absolute; top: 0; left: 0; right: 0;
       padding: 0.8rem 1.2rem;
       display: flex; align-items: center; justify-content: space-between;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
       pointer-events: auto;
     }
-
     #topbar img { height: 22px; width: auto; }
-
-    #live-badge {
-      font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
-      color: #f5b800; background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(245,184,0,0.4);
-      padding: 0.2rem 0.6rem; border-radius: 3px;
-    }
+    #badge { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: #f5b800; background: rgba(0,0,0,0.6); border: 1px solid rgba(245,184,0,0.4); padding: 0.2rem 0.6rem; border-radius: 3px; }
 
     #hint {
-      position: absolute; bottom: 6rem; left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 7rem; left: 50%; transform: translateX(-50%);
       background: rgba(30,45,74,0.92); border: 1px solid rgba(245,184,0,0.35);
       border-radius: 20px; padding: 0.55rem 1.3rem;
       font-size: 0.75rem; color: white; white-space: nowrap;
-      transition: opacity 0.5s;
+      transition: opacity 0.5s; text-align: center;
     }
 
     #exit-btn {
       position: absolute; bottom: 1.5rem; right: 1.2rem;
       background: rgba(30,45,74,0.92); border: 1px solid rgba(245,184,0,0.35);
-      color: white; border-radius: 6px;
-      font-family: 'Lato', sans-serif; font-weight: 700; font-size: 0.72rem;
-      padding: 0.55rem 1.1rem; cursor: pointer; pointer-events: auto;
+      color: white; border-radius: 6px; font-family: 'Lato', sans-serif;
+      font-weight: 700; font-size: 0.72rem; padding: 0.55rem 1.1rem;
+      cursor: pointer; pointer-events: auto;
     }
+
+    #loading {
+      position: fixed; inset: 0; z-index: 50; background: #0a0f1a;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 1rem; color: white; text-align: center; padding: 2rem;
+    }
+    #loading img { height: 36px; width: auto; margin-bottom: 0.5rem; }
+    #loading p { font-size: 0.85rem; color: rgba(255,255,255,0.6); max-width: 280px; line-height: 1.6; }
+    .spinner { width: 36px; height: 36px; border: 3px solid rgba(245,184,0,0.2); border-top-color: #f5b800; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #start-screen {
+      display: none; position: fixed; inset: 0; z-index: 40; background: #0a0f1a;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 1.2rem; padding: 2rem; text-align: center;
+    }
+    #start-screen img { height: 36px; width: auto; }
+    #start-screen h2 { font-size: 1.2rem; color: white; }
+    #start-screen p { font-size: 0.82rem; color: rgba(255,255,255,0.6); max-width: 280px; line-height: 1.6; }
+    #start-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: #f5b800; color: #1e2d4a; font-family: 'Lato', sans-serif;
+      font-weight: 900; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase;
+      border: none; border-radius: 6px; padding: 1rem 2rem; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(245,184,0,0.3);
+    }
+    #back-link { color: rgba(255,255,255,0.4); font-size: 0.75rem; text-decoration: none; }
   </style>
 </head>
 <body>
 
-<!-- Loading screen -->
-<div id="loading">
-  <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
-  <div class="spinner"></div>
-  <p>Loading model…<br>This may take a moment on first load.</p>
-</div>
+<canvas id="canvas"></canvas>
 
-<!-- Ready screen (after model loads) -->
-<div id="ready">
-  <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
-  <h2>Model Ready</h2>
-  <p>Point your camera at the ground near your reference marker, then tap Launch to place the model.</p>
-  <button id="start-ar-btn">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-    </svg>
-    Launch AR
-  </button>
-</div>
-
-<!-- AR overlay -->
-<div id="ar-overlay">
+<div id="ui" style="display:none;">
   <div id="topbar">
     <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
-    <span id="live-badge">● LIVE AR</span>
+    <span id="badge">● LIVE AR</span>
   </div>
-  <div id="hint">Drag to move · Twist two fingers to rotate</div>
+  <div id="hint">Point camera at ground · Tap to place</div>
   <button id="exit-btn">✕ Exit AR</button>
 </div>
 
-<!-- Model viewer (invisible until AR starts) -->
-<model-viewer
-  id="mv"
-  src="Butterfield%20BESS%20Site%20FINAL.glb"
-  ar
-  ar-modes="webxr"
-  ar-scale="fixed"
-  shadow-intensity="0"
-  shadow-softness="0"
-  style="position:fixed; width:1px; height:1px; opacity:0; pointer-events:none; top:0; left:0;">
-  <button slot="ar-button" id="ar-btn" style="display:none;"></button>
-</model-viewer>
+<div id="loading">
+  <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
+  <div class="spinner"></div>
+  <p id="loading-msg">Loading model…</p>
+</div>
 
-<script>
-  const mv = document.getElementById('mv');
-  const loading = document.getElementById('loading');
-  const ready = document.getElementById('ready');
-  const arOverlay = document.getElementById('ar-overlay');
-  const hint = document.getElementById('hint');
-  const startArBtn = document.getElementById('start-ar-btn');
-  const exitBtn = document.getElementById('exit-btn');
+<div id="start-screen">
+  <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
+  <h2>Model Ready</h2>
+  <p>Point your camera at the ground near your marker, then tap Launch to place the model.</p>
+  <button id="start-btn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    Launch AR
+  </button>
+  <a href="index.html" id="back-link">← Back</a>
+</div>
 
-  // When model finishes loading, show ready screen
-  mv.addEventListener('load', () => {
-    loading.style.opacity = '0';
-    setTimeout(() => {
-      loading.style.display = 'none';
-      ready.style.display = 'flex';
-    }, 500);
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const canvas = document.getElementById('canvas');
+const ui = document.getElementById('ui');
+const hint = document.getElementById('hint');
+const loading = document.getElementById('loading');
+const loadingMsg = document.getElementById('loading-msg');
+const startScreen = document.getElementById('start-screen');
+const startBtn = document.getElementById('start-btn');
+const exitBtn = document.getElementById('exit-btn');
+
+// Three.js setup
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.xr.enabled = true;
+renderer.shadowMap.enabled = false;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 2000);
+
+// Lighting
+scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+dir.position.set(5, 10, 5);
+dir.castShadow = false;
+scene.add(dir);
+
+// Reticle
+const reticleGeo = new THREE.RingGeometry(0.15, 0.2, 32);
+reticleGeo.rotateX(-Math.PI / 2);
+const reticle = new THREE.Mesh(reticleGeo, new THREE.MeshBasicMaterial({ color: 0xf5b800, side: THREE.DoubleSide }));
+reticle.visible = false;
+scene.add(reticle);
+
+const dotGeo = new THREE.CircleGeometry(0.05, 32);
+dotGeo.rotateX(-Math.PI / 2);
+reticle.add(new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0xf5b800 })));
+
+// Model
+const modelGroup = new THREE.Group();
+modelGroup.visible = false;
+scene.add(modelGroup);
+
+let modelLoaded = false;
+let placed = false;
+let hitTestSource = null;
+let hitTestSourceRequested = false;
+let reticleMatrix = new THREE.Matrix4();
+
+// Load model
+const loader = new GLTFLoader();
+loader.load(
+  'Butterfield%20BESS%20Site%20FINAL.glb',
+  (gltf) => {
+    gltf.scene.traverse(n => {
+      if (n.isMesh) { n.castShadow = false; n.receiveShadow = false; }
+    });
+    modelGroup.add(gltf.scene);
+    modelLoaded = true;
+    loading.style.display = 'none';
+    startScreen.style.display = 'flex';
+  },
+  (progress) => {
+    if (progress.total > 0) {
+      const pct = Math.round(progress.loaded / progress.total * 100);
+      loadingMsg.textContent = `Loading model… ${pct}%`;
+    }
+  },
+  (err) => {
+    console.error(err);
+    loadingMsg.textContent = 'Failed to load model. Please reload.';
+    document.querySelector('.spinner').style.display = 'none';
+  }
+);
+
+// Timeout
+setTimeout(() => {
+  if (!modelLoaded) {
+    loadingMsg.textContent = 'Taking longer than expected… check your connection.';
+    document.querySelector('.spinner').style.display = 'none';
+  }
+}, 30000);
+
+// Touch rotation after placement
+let lastTouchX = 0;
+canvas.addEventListener('touchstart', e => {
+  if (!placed || e.touches.length !== 2) return;
+  lastTouchX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+}, { passive: true });
+
+canvas.addEventListener('touchmove', e => {
+  if (!placed || e.touches.length !== 2) return;
+  const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+  modelGroup.rotation.y += (currentX - lastTouchX) * 0.01;
+  lastTouchX = currentX;
+}, { passive: true });
+
+// Start AR
+async function startAR() {
+  const session = await navigator.xr.requestSession('immersive-ar', {
+    requiredFeatures: ['hit-test'],
+    optionalFeatures: ['dom-overlay'],
+    domOverlay: { root: document.getElementById('ui') }
   });
 
-  // Timeout fallback
-  setTimeout(() => {
-    if (loading.style.display !== 'none') {
-      loading.querySelector('p').textContent = 'Taking longer than expected… check your connection and try reloading.';
-      loading.querySelector('.spinner').style.display = 'none';
-    }
-  }, 25000);
+  renderer.xr.setReferenceSpaceType('local');
+  await renderer.xr.setSession(session);
 
-  // Launch AR when user is ready
-  startArBtn.addEventListener('click', () => {
-    ready.style.display = 'none';
-    mv.activateAR();
+  ui.style.display = 'block';
+  startScreen.style.display = 'none';
+
+  session.addEventListener('end', () => {
+    ui.style.display = 'none';
+    placed = false;
+    modelGroup.visible = false;
+    reticle.visible = false;
+    hitTestSource = null;
+    hitTestSourceRequested = false;
+    startScreen.style.display = 'flex';
   });
 
-  // AR session events
-  mv.addEventListener('ar-status', (e) => {
-    if (e.detail.status === 'session-started') {
-      arOverlay.classList.add('visible');
-      setTimeout(() => { hint.style.opacity = '0'; }, 5000);
-    }
-    if (e.detail.status === 'not-presenting') {
-      arOverlay.classList.remove('visible');
-      window.location.href = 'index.html';
-    }
-    if (e.detail.status === 'failed') {
-      alert('AR failed to start. Make sure ARCore is installed and camera permission is granted.');
-      window.location.href = 'index.html';
-    }
+  // Tap to place / reposition
+  session.addEventListener('select', () => {
+    if (!modelLoaded || !reticle.visible) return;
+    modelGroup.position.setFromMatrixPosition(reticleMatrix);
+    modelGroup.visible = true;
+    placed = true;
+    hint.textContent = 'Drag to move · Twist two fingers to rotate';
+    setTimeout(() => { hint.style.opacity = '0'; }, 4000);
   });
 
-  exitBtn.addEventListener('click', () => {
-    mv.exitPresentationMode?.();
-    window.location.href = 'index.html';
+  renderer.setAnimationLoop((time, frame) => {
+    if (!frame) return;
+    const refSpace = renderer.xr.getReferenceSpace();
+    const xrSession = renderer.xr.getSession();
+
+    if (!hitTestSourceRequested) {
+      xrSession.requestReferenceSpace('viewer').then(vs => {
+        xrSession.requestHitTestSource({ space: vs }).then(src => {
+          hitTestSource = src;
+        });
+      });
+      hitTestSourceRequested = true;
+    }
+
+    if (hitTestSource) {
+      const results = frame.getHitTestResults(hitTestSource);
+      if (results.length > 0) {
+        const pose = results[0].getPose(refSpace);
+        reticleMatrix.fromArray(pose.transform.matrix);
+        reticle.position.setFromMatrixPosition(reticleMatrix);
+        reticle.quaternion.setFromRotationMatrix(reticleMatrix);
+        reticle.visible = !placed;
+      } else {
+        reticle.visible = false;
+      }
+    }
+
+    renderer.render(scene, camera);
   });
+}
+
+startBtn.addEventListener('click', startAR);
+
+exitBtn.addEventListener('click', async () => {
+  const session = renderer.xr.getSession();
+  if (session) await session.end();
+  window.location.href = 'index.html';
+});
 </script>
 </body>
 </html>
