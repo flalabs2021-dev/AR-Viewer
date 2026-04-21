@@ -231,7 +231,7 @@
           </div>
         </div>
 
-        <button class="btn-ar android-only" id="ar-btn" onclick="document.getElementById('mv').activateAR()">
+        <button class="btn-ar android-only" id="ar-btn" >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
           </svg>
@@ -272,83 +272,17 @@
 </body>
 </html>
 
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-
-<model-viewer
-  id="mv"
-  src="Butterfield%20BESS%20Site%20FINAL.glb"
-  ar
-  ar-modes="webxr"
-  ar-scale="fixed"
-  touch-action="none"
-  shadow-intensity="0"
-  shadow-softness="0"
-  style="position:fixed; width:1px; height:1px; opacity:0; pointer-events:none; top:0; left:0;">
-  <button slot="ar-button" style="display:none;"></button>
-</model-viewer>
-
-<div id="ar-ui" style="display:none; position:fixed; inset:0; z-index:999; pointer-events:none;">
-  <!-- Top bar -->
-  <div style="position:absolute; top:0; left:0; right:0; padding:0.8rem 1.2rem; display:flex; align-items:center; justify-content:space-between; background:linear-gradient(to bottom,rgba(0,0,0,0.55),transparent); pointer-events:auto;">
-    <img src="chaberton-energy.webp" alt="Chaberton Energy" style="height:22px; width:auto;" />
-    <span style="font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:#f5b800; background:rgba(0,0,0,0.6); border:1px solid rgba(245,184,0,0.4); padding:0.2rem 0.6rem; border-radius:3px;">● LIVE AR</span>
-  </div>
-  <!-- Hint -->
-  <div id="ar-hint" style="position:absolute; bottom:7rem; left:50%; transform:translateX(-50%); background:rgba(30,45,74,0.92); border:1px solid rgba(245,184,0,0.35); border-radius:20px; padding:0.55rem 1.3rem; font-size:0.75rem; color:white; white-space:nowrap; transition:opacity 0.5s; pointer-events:none;">Drag inside model to move · Twist to rotate</div>
-  <!-- Move to Me button -->
-  <button id="move-to-me" style="position:absolute; bottom:1.5rem; left:1.2rem; background:#f5b800; border:none; color:#1e2d4a; border-radius:6px; font-family:'Lato',sans-serif; font-weight:900; font-size:0.72rem; letter-spacing:0.05em; text-transform:uppercase; padding:0.55rem 1rem; cursor:pointer; pointer-events:auto; display:flex; align-items:center; gap:0.4rem;">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
-    Move to Me
-  </button>
-  <!-- Exit button -->
-  <button id="ar-exit" style="position:absolute; bottom:1.5rem; right:1.2rem; background:rgba(30,45,74,0.92); border:1px solid rgba(245,184,0,0.35); color:white; border-radius:6px; font-family:'Lato',sans-serif; font-weight:700; font-size:0.72rem; padding:0.55rem 1.1rem; cursor:pointer; pointer-events:auto;">✕ Exit AR</button>
-</div>
-
 <script>
-  const mv = document.getElementById('mv');
-  const arUI = document.getElementById('ar-ui');
-  const arHint = document.getElementById('ar-hint');
+  const isAndroid = /android/i.test(navigator.userAgent);
+  if (isAndroid) {
+    document.getElementById('ar-btn').style.display = 'flex';
+    document.getElementById('non-android-msg').style.display = 'none';
+  }
 
-  mv.addEventListener('ar-status', (e) => {
-    if (e.detail.status === 'session-started') {
-      arUI.style.display = 'block';
-      setTimeout(() => { arHint.style.opacity = '0'; }, 5000);
-    }
-    if (e.detail.status === 'not-presenting') {
-      arUI.style.display = 'none';
-      arHint.style.opacity = '1';
-    }
-    if (e.detail.status === 'failed') {
-      alert('AR failed to start. Make sure ARCore is installed and camera permission is granted.');
-    }
-  });
-
-  // Move to Me — repositions model in front of camera using model-viewer's AR object position
-  document.getElementById('move-to-me').addEventListener('click', () => {
-    try {
-      // model-viewer exposes the AR session via the underlying scene
-      const scene = mv[Object.getOwnPropertySymbols(mv).find(s => s.toString().includes('scene') || s.toString().includes('Scene'))] 
-                    || mv.shadowRoot;
-      // Fallback: use model-viewer's built-in method if available
-      if (typeof mv.resetTurntableRotation === 'function') {
-        mv.resetTurntableRotation();
-      }
-      // The most reliable approach: end and restart the AR session
-      // which will re-detect surface near current camera position
-      mv.exitPresentationMode().then(() => {
-        setTimeout(() => { mv.activateAR(); }, 500);
-      });
-    } catch(e) {
-      // Simple restart fallback
-      mv.exitPresentationMode().then(() => {
-        setTimeout(() => { mv.activateAR(); }, 500);
-      });
-    }
-  });
-
-  document.getElementById('ar-exit').addEventListener('click', () => {
-    mv.exitPresentationMode?.();
-    arUI.style.display = 'none';
-    arHint.style.opacity = '1';
+  document.getElementById('ar-btn').addEventListener('click', () => {
+    const glbUrl = 'https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb';
+    const fallback = 'https://arvr.google.com/scene-viewer?file=' + glbUrl + '&mode=ar_preferred&resizable=false&title=Butterfield%20BESS%20Site';
+    const intent = 'intent://arvr.google.com/scene-viewer/1.0?file=' + glbUrl + '&mode=ar_preferred&resizable=false&title=Butterfield%20BESS%20Site#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=' + encodeURIComponent(fallback) + ';end;';
+    window.location.href = intent;
   });
 </script>
