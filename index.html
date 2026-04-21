@@ -231,7 +231,7 @@
           </div>
         </div>
 
-        <button class="btn-ar android-only" id="ar-btn" onclick="window.location.href='ar.html'">
+        <button class="btn-ar android-only" id="ar-btn" onclick="document.getElementById('mv').activateAR()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
           </svg>
@@ -271,3 +271,52 @@
 
 </body>
 </html>
+
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+<model-viewer
+  id="mv"
+  src="Butterfield%20BESS%20Site%20FINAL.glb"
+  ar
+  ar-modes="webxr"
+  ar-scale="fixed"
+  shadow-intensity="0"
+  shadow-softness="0"
+  style="position:fixed; width:1px; height:1px; opacity:0; pointer-events:none; top:0; left:0;">
+  <button slot="ar-button" style="display:none;"></button>
+</model-viewer>
+
+<div id="ar-ui" style="display:none; position:fixed; inset:0; z-index:999; pointer-events:none;">
+  <div style="position:absolute; top:0; left:0; right:0; padding:0.8rem 1.2rem; display:flex; align-items:center; justify-content:space-between; background:linear-gradient(to bottom,rgba(0,0,0,0.55),transparent); pointer-events:auto;">
+    <img src="chaberton-energy.webp" alt="Chaberton Energy" style="height:22px; width:auto;" />
+    <span style="font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:#f5b800; background:rgba(0,0,0,0.6); border:1px solid rgba(245,184,0,0.4); padding:0.2rem 0.6rem; border-radius:3px;">● LIVE AR</span>
+  </div>
+  <div id="ar-hint" style="position:absolute; bottom:5.5rem; left:50%; transform:translateX(-50%); background:rgba(30,45,74,0.92); border:1px solid rgba(245,184,0,0.35); border-radius:20px; padding:0.55rem 1.3rem; font-size:0.75rem; color:white; white-space:nowrap; transition:opacity 0.5s; pointer-events:none;">Drag to move · Twist two fingers to rotate</div>
+  <button id="ar-exit" style="position:absolute; bottom:1.5rem; right:1.2rem; background:rgba(30,45,74,0.92); border:1px solid rgba(245,184,0,0.35); color:white; border-radius:6px; font-weight:700; font-size:0.72rem; padding:0.55rem 1.1rem; cursor:pointer; pointer-events:auto;">✕ Exit AR</button>
+</div>
+
+<script>
+  const mv = document.getElementById('mv');
+  const arUI = document.getElementById('ar-ui');
+  const arHint = document.getElementById('ar-hint');
+
+  mv.addEventListener('ar-status', (e) => {
+    if (e.detail.status === 'session-started') {
+      arUI.style.display = 'block';
+      setTimeout(() => { arHint.style.opacity = '0'; }, 5000);
+    }
+    if (e.detail.status === 'not-presenting') {
+      arUI.style.display = 'none';
+      arHint.style.opacity = '1';
+    }
+    if (e.detail.status === 'failed') {
+      alert('AR failed to start. Make sure ARCore is installed and camera permission is granted.');
+    }
+  });
+
+  document.getElementById('ar-exit').addEventListener('click', () => {
+    mv.exitPresentationMode?.();
+    arUI.style.display = 'none';
+    arHint.style.opacity = '1';
+  });
+</script>
