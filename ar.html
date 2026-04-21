@@ -38,6 +38,48 @@
       cursor: pointer; pointer-events: auto;
     }
 
+    #rotation-panel {
+      display: none;
+      position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      background: rgba(30,45,74,0.95); border: 1px solid rgba(245,184,0,0.35);
+      border-radius: 12px; padding: 1rem 1.5rem;
+      flex-direction: column; align-items: center; gap: 0.75rem;
+      pointer-events: auto; min-width: 260px;
+    }
+
+    #rotation-panel.visible { display: flex; }
+
+    #rotation-label {
+      font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #f5b800; font-weight: 700;
+    }
+
+    #rotation-slider {
+      -webkit-appearance: none;
+      width: 100%; height: 4px;
+      background: rgba(245,184,0,0.3); border-radius: 2px; outline: none;
+    }
+
+    #rotation-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px; height: 24px;
+      border-radius: 50%; background: #f5b800; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    #rotation-degrees {
+      font-size: 0.8rem; color: white; font-weight: 700;
+    }
+
+    #lock-btn {
+      background: #f5b800; color: #1e2d4a;
+      border: none; border-radius: 6px;
+      font-family: 'Lato', sans-serif; font-weight: 900;
+      font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.6rem 1.4rem; cursor: pointer;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+
     #loading {
       position: fixed; inset: 0; z-index: 50; background: #0a0f1a;
       display: flex; flex-direction: column; align-items: center;
@@ -77,6 +119,17 @@
   </div>
   <div id="hint">Point camera at ground · Tap to place</div>
   <button id="exit-btn">✕ Exit AR</button>
+
+  <!-- Rotation panel -->
+  <div id="rotation-panel">
+    <span id="rotation-label">Adjust Rotation</span>
+    <input type="range" id="rotation-slider" min="0" max="360" value="0" step="1" />
+    <span id="rotation-degrees">0°</span>
+    <button id="lock-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Lock Rotation
+    </button>
+  </div>
 </div>
 
 <div id="loading">
@@ -191,38 +244,7 @@ setTimeout(() => {
   }
 }, 30000);
 
-// Touch handling - must use document level during WebXR
-let lastTouchX = 0;
-let lastTouchY = 0;
-let isTwoFinger = false;
-let lastPinchDist = 0;
-
-document.addEventListener('touchstart', e => {
-  if (!placed) return;
-  if (e.touches.length === 2) {
-    isTwoFinger = true;
-    lastTouchX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-    lastPinchDist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-  } else {
-    isTwoFinger = false;
-  }
-}, { passive: true });
-
-document.addEventListener('touchmove', e => {
-  if (!placed || !isTwoFinger || e.touches.length !== 2) return;
-  const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-  const deltaX = currentX - lastTouchX;
-  // Rotate around model's own Y axis (origin point)
-  modelGroup.rotation.y += deltaX * 0.012;
-  lastTouchX = currentX;
-}, { passive: true });
-
-document.addEventListener('touchend', e => {
-  if (e.touches.length < 2) isTwoFinger = false;
-}, { passive: true });
+// Rotation handled by slider
 
 // Start AR
 async function startAR() {
@@ -254,8 +276,13 @@ async function startAR() {
     modelGroup.position.setFromMatrixPosition(reticleMatrix);
     modelGroup.visible = true;
     placed = true;
-    hint.textContent = 'Drag to move · Twist two fingers to rotate';
-    setTimeout(() => { hint.style.opacity = '0'; }, 4000);
+    hint.textContent = 'Use the slider below to rotate, then tap Lock Rotation';
+    hint.style.opacity = '1';
+    // Show rotation panel
+    document.getElementById('rotation-panel').classList.add('visible');
+    // Reset slider
+    const slider = document.getElementById('rotation-slider');
+    slider.value = Math.round(THREE.MathUtils.radToDeg(modelGroup.rotation.y) % 360 + 360) % 360;
   });
 
   renderer.setAnimationLoop((time, frame) => {
@@ -295,6 +322,24 @@ exitBtn.addEventListener('click', async () => {
   const session = renderer.xr.getSession();
   if (session) await session.end();
   window.location.href = 'index.html';
+});
+
+// Rotation slider
+const slider = document.getElementById('rotation-slider');
+const degreesLabel = document.getElementById('rotation-degrees');
+
+slider.addEventListener('input', () => {
+  const deg = parseFloat(slider.value);
+  degreesLabel.textContent = Math.round(deg) + '°';
+  modelGroup.rotation.y = THREE.MathUtils.degToRad(deg);
+});
+
+// Lock rotation button
+document.getElementById('lock-btn').addEventListener('click', () => {
+  document.getElementById('rotation-panel').classList.remove('visible');
+  hint.textContent = 'Rotation locked! Walk around to inspect.';
+  hint.style.opacity = '1';
+  setTimeout(() => { hint.style.opacity = '0'; }, 3000);
 });
 </script>
 </body>
