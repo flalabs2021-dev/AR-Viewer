@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Butterfield BESS Site — AR Viewer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #00ff87;
+      --dark: #0a0f0d;
+      --mid: #111a14;
+      --border: rgba(0,255,135,0.15);
+      --text: #c8d8cc;
+    }
+
+    body {
+      background-color: var(--dark);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Radial glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(0,255,135,0.08) 0%, transparent 70%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--mid);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      max-width: 480px;
+      width: 100%;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--green);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.8rem;
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 1.5rem;
+      animation: fadeUp 0.8s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 8vw, 2.8rem);
+      letter-spacing: 0.05em;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      animation: fadeUp 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: #7a9a82;
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.03em;
+      animation: fadeUp 0.8s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      background: var(--green);
+      color: #000;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      padding: 1rem 2rem;
+      border-radius: 3px;
+      width: 100%;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      animation: fadeUp 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+      box-shadow: 0 0 0 0 rgba(0,255,135,0.4);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,255,135,0.25);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .note {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: #4a6a52;
+      letter-spacing: 0.02em;
+      animation: fadeUp 0.8s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    .specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      animation: fadeUp 0.8s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .spec {
+      text-align: left;
+      background: rgba(0,255,135,0.03);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.75rem 1rem;
+    }
+
+    .spec-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #4a6a52;
+      margin-bottom: 0.25rem;
+    }
+
+    .spec-value {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--green);
+    }
+
+    /* Android-only visibility */
+    .android-only { display: none; }
+    .non-android { display: block; }
+
+    @media (pointer: coarse) {
+      /* likely mobile - further JS detection handles android */
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="tag">AR Site Model</div>
+
+  <div class="icon">
+    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="70" height="70" rx="3" stroke="rgba(0,255,135,0.2)" stroke-width="1"/>
+      <path d="M36 16L54 26V46L36 56L18 46V26L36 16Z" stroke="#00ff87" stroke-width="1.5" fill="rgba(0,255,135,0.05)"/>
+      <path d="M36 16V56M18 26L54 46M54 26L18 46" stroke="#00ff87" stroke-width="0.75" stroke-dasharray="3 3" opacity="0.4"/>
+      <circle cx="36" cy="36" r="3" fill="#00ff87"/>
+    </svg>
+  </div>
+
+  <h1>Butterfield BESS Site</h1>
+  <p class="subtitle">Battery Energy Storage System — 3D Site Model</p>
+
+  <!-- Android AR Button -->
+  <a id="ar-btn" class="btn android-only"
+    href="intent://arvr.google.com/scene-viewer/1.0?file=https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb&mode=ar_preferred&resizable=false&title=Butterfield%20BESS%20Site#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=https://arvr.google.com/scene-viewer?file=https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb&resizable=false;end;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>
+    View in Augmented Reality
+  </a>
+
+  <!-- Non-Android message -->
+  <div class="non-android" id="non-android-msg">
+    <div class="btn" style="background: rgba(0,255,135,0.08); color: var(--green); cursor: default; border: 1px solid var(--border);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      Open on Android to View in AR
+    </div>
+    <p class="note">Scene Viewer requires an Android device with ARCore support.<br>Share this link with an Android user to experience the model in AR.</p>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="specs">
+    <div class="spec">
+      <div class="spec-label">Height</div>
+      <div class="spec-value">35 ft</div>
+    </div>
+    <div class="spec">
+      <div class="spec-label">Scale</div>
+      <div class="spec-value">1 : 1</div>
+    </div>
+    <div class="spec">
+      <div class="spec-label">Format</div>
+      <div class="spec-value">GLB / AR</div>
+    </div>
+    <div class="spec">
+      <div class="spec-label">Platform</div>
+      <div class="spec-value">Android</div>
+    </div>
+  </div>
+
+  <p class="note" style="margin-top:1.2rem;">Tap the button above to place the model at true scale in your environment.</p>
+</div>
+
+<script>
+  const isAndroid = /android/i.test(navigator.userAgent);
+  if (isAndroid) {
+    document.querySelectorAll('.android-only').forEach(el => el.style.display = 'inline-flex');
+    document.querySelectorAll('.non-android').forEach(el => el.style.display = 'none');
+  }
+</script>
+
+</body>
+</html>
