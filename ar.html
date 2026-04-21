@@ -3,358 +3,334 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Butterfield BESS — AR View | Chaberton Energy</title>
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
+  <title>Butterfield BESS — AR | Chaberton Energy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #000; font-family: 'Lato', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
 
-    :root {
-      --navy: #1e2d4a;
-      --blue: #1e2d4a;
-      --sky: #f5b800;
-      --light: #f4f7fa;
-      --white: #ffffff;
-      --text: #2c3e50;
-      --muted: #6b8299;
-      --border: #d0dce8;
-      --accent: #f0f4f8;
+    #overlay {
+      position: fixed; inset: 0; z-index: 10; pointer-events: none;
     }
 
-    html, body {
-      width: 100%; height: 100%;
-      background: var(--navy);
-      font-family: 'Lato', sans-serif;
-      overflow: hidden;
-    }
-
-    /* ── Launch screen ── */
-    #launch {
-      position: fixed; inset: 0; z-index: 100;
-      background: var(--light);
-      display: flex; flex-direction: column;
-      transition: opacity 0.5s ease;
-      overflow-y: auto;
-    }
-
-    .launch-header {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-
-    .back-link {
-      font-size: 0.78rem; color: var(--blue);
-      text-decoration: none; font-weight: 700;
-      display: flex; align-items: center; gap: 0.3rem;
-    }
-
-    .launch-hero {
-      background: linear-gradient(135deg, var(--navy) 0%, #1e3d5c 60%, #2d5f8a 100%);
-      padding: 2.5rem 1.5rem 2rem;
-      text-align: center;
-      position: relative; overflow: hidden;
-    }
-
-    .launch-hero::before {
-      content: ''; position: absolute; inset: 0;
-      background-image: radial-gradient(circle at 80% 20%, rgba(93,164,229,0.15) 0%, transparent 50%);
-    }
-
-    .launch-tag {
-      display: inline-block; font-size: 0.6rem;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: #f5b800; border: 1px solid rgba(245,184,0,0.4);
-      padding: 0.25rem 0.8rem; border-radius: 20px;
-      margin-bottom: 1rem; position: relative;
-    }
-
-    .launch-hero h1 {
-      font-family: 'Merriweather', serif; font-weight: 700;
-      font-size: 1.6rem; color: var(--white);
-      line-height: 1.2; margin-bottom: 0.4rem; position: relative;
-    }
-
-    .launch-hero p {
-      font-size: 0.8rem; font-weight: 300;
-      color: rgba(255,255,255,0.65);
-      position: relative;
-    }
-
-    .launch-body {
-      padding: 1.5rem;
-      display: flex; flex-direction: column; gap: 1rem;
-      max-width: 480px; width: 100%; margin: 0 auto;
-    }
-
-    .steps-card {
-      background: var(--white); border: 1px solid var(--border);
-      border-radius: 8px; overflow: hidden;
-      box-shadow: 0 2px 12px rgba(26,46,74,0.06);
-    }
-
-    .steps-header {
-      background: var(--accent); border-bottom: 1px solid var(--border);
-      padding: 0.8rem 1.2rem;
-      font-size: 0.65rem; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--muted); font-weight: 700;
-    }
-
-    .step {
-      display: flex; gap: 0.75rem; align-items: flex-start;
-      padding: 0.65rem 1.2rem; border-bottom: 1px solid var(--border);
-    }
-    .step:last-child { border-bottom: none; }
-
-    .step-num {
-      width: 20px; height: 20px; background: var(--navy); color: white;
-      border-radius: 50%; font-size: 0.6rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 1px;
-    }
-
-    .step-text { font-size: 0.8rem; line-height: 1.5; color: var(--text); }
-    .step-text strong { color: var(--navy); font-weight: 700; }
-
-    .launch-btn {
-      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
-      background: var(--navy); color: white;
-      font-family: 'Lato', sans-serif; font-weight: 700;
-      font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase;
-      border: none; border-radius: 6px;
-      width: 100%; padding: 1rem;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 16px rgba(30,45,74,0.25);
-    }
-
-    .launch-btn:hover { background: #2a3d60; transform: translateY(-1px); }
-    .launch-btn:active { transform: translateY(0); }
-    .launch-btn svg { width: 18px; height: 18px; }
-
-    .launch-note {
-      font-size: 0.7rem; color: var(--muted);
-      text-align: center; line-height: 1.5;
-      padding-bottom: 1rem;
-    }
-
-    /* ── Model Viewer ── */
-    model-viewer {
-      width: 100%; height: 100%;
-      position: fixed; inset: 0;
-      background-color: transparent;
-      --poster-color: transparent;
-      display: none;
-    }
-
-    /* ── AR Overlay UI ── */
-    #ar-ui {
-      display: none;
-      position: fixed; inset: 0; z-index: 10;
-      pointer-events: none;
-    }
-
-    #ar-ui.visible { display: block; }
-
-    .ar-topbar {
+    /* Top bar */
+    #topbar {
       position: absolute; top: 0; left: 0; right: 0;
       padding: 0.8rem 1.2rem;
       display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
       pointer-events: auto;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
     }
 
-    .ar-logo {
-      height: 22px; width: auto;
-    }
+    #topbar img { height: 22px; width: auto; }
 
-    .ar-badge {
+    #live-badge {
       font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
       color: #f5b800; background: rgba(0,0,0,0.6);
       border: 1px solid rgba(245,184,0,0.4);
       padding: 0.2rem 0.6rem; border-radius: 3px;
-      font-family: 'Lato', sans-serif;
     }
 
-    .ar-hint {
-      position: absolute; bottom: 5.5rem; left: 50%; transform: translateX(-50%);
-      background: rgba(30,45,74,0.9); border: 1px solid rgba(245,184,0,0.3);
-      border-radius: 20px; padding: 0.5rem 1.2rem;
-      font-size: 0.72rem; color: rgba(255,255,255,0.9);
-      white-space: nowrap; text-align: center;
-      font-family: 'Lato', sans-serif;
-      transition: opacity 0.5s;
-      pointer-events: none;
+    /* Hint pill */
+    #hint {
+      position: absolute; bottom: 6rem; left: 50%; transform: translateX(-50%);
+      background: rgba(30,45,74,0.92); border: 1px solid rgba(245,184,0,0.35);
+      border-radius: 20px; padding: 0.55rem 1.3rem;
+      font-size: 0.78rem; color: #fff; white-space: nowrap;
+      transition: opacity 0.5s; text-align: center;
     }
 
-    .ar-exit {
+    /* Exit button */
+    #exit-btn {
       position: absolute; bottom: 1.5rem; right: 1.2rem;
-      background: rgba(30,45,74,0.9); border: 1px solid rgba(245,184,0,0.3);
+      background: rgba(30,45,74,0.92); border: 1px solid rgba(245,184,0,0.35);
       color: white; border-radius: 6px;
-      font-family: 'Lato', sans-serif; font-weight: 700;
-      font-size: 0.72rem; letter-spacing: 0.05em;
-      padding: 0.5rem 1rem; cursor: pointer;
-      pointer-events: auto;
+      font-family: 'Lato', sans-serif; font-weight: 700; font-size: 0.72rem;
+      padding: 0.55rem 1.1rem; cursor: pointer; pointer-events: auto;
     }
 
-    /* Not Android */
-    #not-android {
-      display: none; position: fixed; inset: 0; z-index: 200;
-      background: var(--light);
-      align-items: center; justify-content: center;
-      flex-direction: column; padding: 2rem; text-align: center; gap: 1rem;
+    /* Loading screen */
+    #loading {
+      position: fixed; inset: 0; z-index: 50;
+      background: #0a0f1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1rem;
+      color: white; text-align: center; padding: 2rem;
     }
 
-    #not-android h2 {
-      font-family: 'Merriweather', serif;
-      font-size: 1.5rem; color: var(--navy);
-    }
+    #loading img { height: 36px; width: auto; margin-bottom: 0.5rem; }
+    #loading p { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
 
-    #not-android p { font-size: 0.85rem; color: var(--muted); max-width: 300px; line-height: 1.6; }
-    #not-android a { color: var(--blue); font-weight: 700; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(245,184,0,0.2);
+      border-top-color: #f5b800;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Not supported screen */
+    #not-supported {
+      display: none; position: fixed; inset: 0; z-index: 60;
+      background: #f4f7fa;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 1rem; padding: 2rem; text-align: center;
+    }
+    #not-supported img { height: 36px; width: auto; }
+    #not-supported h2 { font-size: 1.3rem; color: #1e2d4a; }
+    #not-supported p { font-size: 0.85rem; color: #6b8299; max-width: 280px; line-height: 1.6; }
+    #not-supported a { color: #1e2d4a; font-weight: 700; }
   </style>
 </head>
 <body>
 
-  <!-- Not Android -->
-  <div id="not-android">
-    <img src="chaberton-energy.webp"
-         alt="Chaberton Energy" style="height:40px; width:auto; margin-bottom:0.5rem;"
-          />
-    <h2>Android Required</h2>
-    <p>This AR experience requires Chrome on an Android device with ARCore support.<br><br>
-      <a href="index.html">← Back to project page</a></p>
+<!-- Loading -->
+<div id="loading">
+  <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
+  <div class="spinner"></div>
+  <p>Loading model…</p>
+</div>
+
+<!-- Not supported -->
+<div id="not-supported">
+  <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
+  <h2>AR Not Available</h2>
+  <p>WebXR with hit-testing is required. Please open this in Chrome on a supported Android device with ARCore installed.</p>
+  <p><a href="index.html">← Back</a></p>
+</div>
+
+<!-- AR Overlay UI -->
+<div id="overlay" style="display:none;">
+  <div id="topbar">
+    <img src="chaberton-energy.webp" alt="Chaberton Energy" onerror="this.style.display='none'" />
+    <span id="live-badge">● LIVE AR</span>
   </div>
+  <div id="hint">Point camera at the ground · Tap to place</div>
+  <button id="exit-btn">✕ Exit AR</button>
+</div>
 
-  <!-- Launch screen -->
-  <div id="launch">
-    <div class="launch-header">
-      <a href="index.html" class="back-link">← Back</a>
-      <img src="chaberton-energy.webp"
-           alt="Chaberton Energy" style="height:28px; width:auto;"
-            />
-      <div style="width:48px;"></div>
-    </div>
+<!-- WebGL canvas -->
+<canvas id="canvas" style="position:fixed;inset:0;width:100%;height:100%;"></canvas>
 
-    <div class="launch-hero">
-      <div class="launch-tag">WebXR · Augmented Reality</div>
-      <h1>Butterfield BESS Site</h1>
-      <p>True 1:1 scale · No shadows · Translate &amp; rotate</p>
-    </div>
+<script type="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
+  import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/GLTFLoader.js';
 
-    <div class="launch-body">
-      <div class="steps-card">
-        <div class="steps-header">How to Use</div>
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-text"><strong>Point</strong> your camera at the ground near your reference marker</div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-text"><strong>Drag</strong> with one finger to move the model</div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-text"><strong>Twist</strong> two fingers to rotate the model</div>
-        </div>
-        <div class="step">
-          <div class="step-num">4</div>
-          <div class="step-text"><strong>Align</strong> the corner bullseye with your ground marker</div>
-        </div>
-        <div class="step">
-          <div class="step-num">5</div>
-          <div class="step-text"><strong>Walk around</strong> freely to inspect the full site</div>
-        </div>
-      </div>
+  const MODEL_URL = 'https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb';
 
-      <button class="launch-btn" id="launch-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-        </svg>
-        Launch AR
-      </button>
+  const loading = document.getElementById('loading');
+  const notSupported = document.getElementById('not-supported');
+  const overlay = document.getElementById('overlay');
+  const hint = document.getElementById('hint');
+  const exitBtn = document.getElementById('exit-btn');
+  const canvas = document.getElementById('canvas');
 
-      <p class="launch-note">Camera and motion permissions required.<br>Point at a flat surface to begin.</p>
-    </div>
-  </div>
+  // Check WebXR support
+  if (!navigator.xr) {
+    loading.style.display = 'none';
+    notSupported.style.display = 'flex';
+    throw new Error('WebXR not supported');
+  }
 
-  <!-- AR Overlay UI -->
-  <div id="ar-ui">
-    <div class="ar-topbar">
-      <img src="chaberton-energy.webp"
-           alt="Chaberton Energy" class="ar-logo"
-            />
-      <span class="ar-badge">● LIVE AR</span>
-    </div>
-    <div class="ar-hint" id="ar-hint">Drag to move · Twist to rotate</div>
-    <button class="ar-exit" id="ar-exit">✕ Exit AR</button>
-  </div>
+  const supported = await navigator.xr.isSessionSupported('immersive-ar');
+  if (!supported) {
+    loading.style.display = 'none';
+    notSupported.style.display = 'flex';
+    throw new Error('immersive-ar not supported');
+  }
 
-  <!-- Model Viewer -->
-  <model-viewer
-    id="mv"
-    src="https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb"
-    ar
-    ar-modes="webxr"
-    ar-scale="fixed"
-    shadow-intensity="0"
-    shadow-softness="0"
-    exposure="1"
-    camera-controls
-  >
-    <button slot="ar-button" style="display:none;"></button>
-  </model-viewer>
+  // Three.js setup
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.xr.enabled = true;
+  renderer.shadowMap.enabled = false;
 
-  <script>
-    const isAndroid = /android/i.test(navigator.userAgent);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 1000);
 
-    if (!isAndroid) {
-      document.getElementById('not-android').style.display = 'flex';
-      document.getElementById('launch').style.display = 'none';
+  // Lighting - no shadows
+  const ambient = new THREE.AmbientLight(0xffffff, 1.2);
+  scene.add(ambient);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dirLight.position.set(5, 10, 5);
+  dirLight.castShadow = false;
+  scene.add(dirLight);
+
+  // Reticle (placement ring)
+  const reticleGeo = new THREE.RingGeometry(0.12, 0.15, 32);
+  reticleGeo.rotateX(-Math.PI / 2);
+  const reticleMat = new THREE.MeshBasicMaterial({ color: 0xf5b800, side: THREE.DoubleSide });
+  const reticle = new THREE.Mesh(reticleGeo, reticleMat);
+  reticle.visible = false;
+  scene.add(reticle);
+
+  // Inner dot of reticle
+  const dotGeo = new THREE.CircleGeometry(0.04, 32);
+  dotGeo.rotateX(-Math.PI / 2);
+  const dot = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0xf5b800, side: THREE.DoubleSide }));
+  reticle.add(dot);
+
+  // Model container
+  const modelGroup = new THREE.Group();
+  modelGroup.visible = false;
+  scene.add(modelGroup);
+
+  // Load GLB
+  const loader = new GLTFLoader();
+  let modelLoaded = false;
+
+  loader.load(MODEL_URL, (gltf) => {
+    const model = gltf.scene;
+    // Disable all shadows
+    model.traverse(node => {
+      if (node.isMesh) {
+        node.castShadow = false;
+        node.receiveShadow = false;
+      }
+    });
+    modelGroup.add(model);
+    modelLoaded = true;
+    loading.style.display = 'none';
+  }, undefined, (err) => {
+    console.error('Model load error:', err);
+    loading.querySelector('p').textContent = 'Failed to load model. Check your connection.';
+  });
+
+  // XR session state
+  let xrSession = null;
+  let hitTestSource = null;
+  let hitTestSourceRequested = false;
+  let placed = false;
+  let reticleMatrix = new THREE.Matrix4();
+
+  // Touch handling for move/rotate after placement
+  let lastTouchX = 0;
+  let lastTouchDist = 0;
+  let isTwoFinger = false;
+
+  canvas.addEventListener('touchstart', (e) => {
+    if (!placed) return;
+    if (e.touches.length === 2) {
+      isTwoFinger = true;
+      lastTouchDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      lastTouchX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    } else if (e.touches.length === 1) {
+      isTwoFinger = false;
+      lastTouchX = e.touches[0].clientX;
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (!placed) return;
+    if (e.touches.length === 2 && isTwoFinger) {
+      // Rotate with two fingers
+      const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const deltaX = currentX - lastTouchX;
+      modelGroup.rotation.y += deltaX * 0.01;
+      lastTouchX = currentX;
+    }
+  }, { passive: true });
+
+  // Start AR session
+  async function startAR() {
+    xrSession = await navigator.xr.requestSession('immersive-ar', {
+      requiredFeatures: ['hit-test'],
+      optionalFeatures: ['dom-overlay'],
+      domOverlay: { root: overlay }
+    });
+
+    renderer.xr.setReferenceSpaceType('local');
+    await renderer.xr.setSession(xrSession);
+
+    overlay.style.display = 'block';
+    hint.style.opacity = '1';
+    hint.textContent = 'Point camera at the ground · Tap to place';
+
+    xrSession.addEventListener('end', () => {
+      xrSession = null;
+      hitTestSource = null;
+      hitTestSourceRequested = false;
+      placed = false;
+      modelGroup.visible = false;
+      reticle.visible = false;
+      overlay.style.display = 'none';
+      window.location.href = 'index.html';
+    });
+
+    // Tap to place
+    xrSession.addEventListener('select', () => {
+      if (!modelLoaded) return;
+      if (!placed && reticle.visible) {
+        // First placement
+        modelGroup.position.setFromMatrixPosition(reticleMatrix);
+        modelGroup.visible = true;
+        placed = true;
+        reticle.visible = false;
+        hint.textContent = 'Drag to move · Twist two fingers to rotate';
+        setTimeout(() => { hint.style.opacity = '0'; }, 4000);
+      } else if (placed) {
+        // Move to new location on tap
+        modelGroup.position.setFromMatrixPosition(reticleMatrix);
+        reticle.visible = false;
+      }
+    });
+
+    renderer.setAnimationLoop(render);
+  }
+
+  function render(timestamp, frame) {
+    if (!frame) return;
+
+    const referenceSpace = renderer.xr.getReferenceSpace();
+    const session = renderer.xr.getSession();
+
+    // Set up hit test source
+    if (!hitTestSourceRequested) {
+      session.requestReferenceSpace('viewer').then((viewerSpace) => {
+        session.requestHitTestSource({ space: viewerSpace }).then((source) => {
+          hitTestSource = source;
+        });
+      });
+      hitTestSourceRequested = true;
     }
 
-    const mv = document.getElementById('mv');
-    const launch = document.getElementById('launch');
-    const arUI = document.getElementById('ar-ui');
-    const arHint = document.getElementById('ar-hint');
-    const launchBtn = document.getElementById('launch-btn');
-    const arExit = document.getElementById('ar-exit');
+    // Update reticle from hit test
+    if (hitTestSource) {
+      const hitTestResults = frame.getHitTestResults(hitTestSource);
+      if (hitTestResults.length > 0) {
+        const hit = hitTestResults[0];
+        const pose = hit.getPose(referenceSpace);
+        reticleMatrix.fromArray(pose.transform.matrix);
+        reticle.visible = true;
+        reticle.position.setFromMatrixPosition(reticleMatrix);
+        reticle.quaternion.setFromRotationMatrix(reticleMatrix);
 
-    mv.style.display = 'block';
-
-    launchBtn.addEventListener('click', () => {
-      mv.activateAR();
-    });
-
-    mv.addEventListener('ar-status', (e) => {
-      if (e.detail.status === 'session-started') {
-        launch.style.opacity = '0';
-        setTimeout(() => launch.style.display = 'none', 500);
-        arUI.classList.add('visible');
-        setTimeout(() => { arHint.style.opacity = '0'; }, 5000);
+        // Move placed model if dragging (single touch after placement)
+        if (placed) {
+          // Keep reticle hidden after placement unless re-tapping
+          reticle.visible = false;
+        }
+      } else {
+        if (!placed) reticle.visible = false;
       }
+    }
 
-      if (e.detail.status === 'not-presenting') {
-        arUI.classList.remove('visible');
-        launch.style.display = 'flex';
-        launch.style.opacity = '1';
-        arHint.style.opacity = '1';
-      }
+    renderer.render(scene, camera);
+  }
 
-      if (e.detail.status === 'failed') {
-        alert('AR failed to start. Make sure ARCore is installed and camera permission is granted.');
-      }
-    });
+  // Exit button
+  exitBtn.addEventListener('click', async () => {
+    if (xrSession) await xrSession.end();
+    window.location.href = 'index.html';
+  });
 
-    arExit.addEventListener('click', () => {
-      mv.exitPresentationMode?.();
-      arUI.classList.remove('visible');
-      launch.style.display = 'flex';
-      launch.style.opacity = '1';
-      arHint.style.opacity = '1';
-    });
-  </script>
-
+  // Auto-start AR
+  await startAR();
+</script>
 </body>
 </html>
