@@ -191,18 +191,37 @@ setTimeout(() => {
   }
 }, 30000);
 
-// Touch rotation after placement
+// Touch handling - must use document level during WebXR
 let lastTouchX = 0;
-canvas.addEventListener('touchstart', e => {
-  if (!placed || e.touches.length !== 2) return;
-  lastTouchX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+let lastTouchY = 0;
+let isTwoFinger = false;
+let lastPinchDist = 0;
+
+document.addEventListener('touchstart', e => {
+  if (!placed) return;
+  if (e.touches.length === 2) {
+    isTwoFinger = true;
+    lastTouchX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    lastPinchDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+  } else {
+    isTwoFinger = false;
+  }
 }, { passive: true });
 
-canvas.addEventListener('touchmove', e => {
-  if (!placed || e.touches.length !== 2) return;
+document.addEventListener('touchmove', e => {
+  if (!placed || !isTwoFinger || e.touches.length !== 2) return;
   const currentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-  modelGroup.rotation.y += (currentX - lastTouchX) * 0.01;
+  const deltaX = currentX - lastTouchX;
+  // Rotate around model's own Y axis (origin point)
+  modelGroup.rotation.y += deltaX * 0.012;
   lastTouchX = currentX;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (e.touches.length < 2) isTwoFinger = false;
 }, { passive: true });
 
 // Start AR
