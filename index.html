@@ -9,15 +9,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --navy: #1a2e4a;
-      --blue: #2d7dd2;
-      --sky: #5ba4e5;
-      --light: #f4f8fc;
+      --navy: #1e2d4a;
+      --blue: #1e2d4a;
+      --sky: #f5b800;
+      --light: #f4f7fa;
       --white: #ffffff;
       --text: #2c3e50;
       --muted: #6b8299;
       --border: #d0dce8;
-      --accent: #e8f2fb;
+      --accent: #f0f4f8;
     }
 
     body {
@@ -70,7 +70,7 @@
     .hero-tag {
       display: inline-block;
       font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--sky); border: 1px solid rgba(93,164,229,0.4);
+      color: #f5b800; border: 1px solid rgba(245,184,0,0.4);
       padding: 0.3rem 0.9rem; border-radius: 20px;
       margin-bottom: 1.2rem; position: relative;
     }
@@ -108,7 +108,7 @@
     }
 
     .card-icon {
-      width: 40px; height: 40px; background: var(--blue);
+      width: 40px; height: 40px; background: #f5b800;
       border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
@@ -138,16 +138,16 @@
 
     .btn-ar {
       display: flex; align-items: center; justify-content: center; gap: 0.6rem;
-      width: 100%; background: var(--blue); color: white;
+      width: 100%; background: var(--navy); color: white;
       font-family: 'Lato', sans-serif; font-weight: 700;
       font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase;
       text-decoration: none; padding: 0.95rem 1.5rem;
       border-radius: 6px; border: none; cursor: pointer;
       transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 16px rgba(45,125,210,0.3);
+      box-shadow: 0 4px 16px rgba(30,45,74,0.25);
     }
 
-    .btn-ar:hover { background: #2568b8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,125,210,0.4); }
+    .btn-ar:hover { background: #2a3d60; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,45,74,0.35); }
     .btn-ar:active { transform: translateY(0); }
     .btn-ar svg { width: 18px; height: 18px; }
 
@@ -174,7 +174,7 @@
       font-size: 0.7rem; color: var(--muted);
       border-top: 1px solid var(--border); background: var(--white); margin-top: auto;
     }
-    footer a { color: var(--blue); text-decoration: none; }
+    footer a { color: var(--navy); text-decoration: none; font-weight: 700; }
 
     .android-only { display: none; }
   </style>
@@ -183,14 +183,7 @@
 
   <header>
     <a href="https://www.chaberton.com" class="logo-wrap" target="_blank">
-      <img src="https://www.chaberton.com/wp-content/smush-webp/2024/07/chaberton-energy.png.webp"
-           alt="Chaberton Energy"
-           style="height:36px; width:auto;"
-           onerror="this.style.display='none'; document.querySelector('.logo-text').style.display='flex';" />
-      <div class="logo-text" style="display:none;">
-        <span class="logo-name">Chaberton Energy</span>
-        <span class="logo-tagline">Creativity · Excellence · Humanity</span>
-      </div>
+      <img src="chaberton-energy.webp" alt="Chaberton Energy" style="height:40px; width:auto;" />
     </a>
   </header>
 
@@ -204,7 +197,7 @@
     <div class="card">
       <div class="card-header">
         <div class="card-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1e2d4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
           </svg>
         </div>

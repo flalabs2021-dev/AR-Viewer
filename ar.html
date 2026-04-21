@@ -10,15 +10,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --navy: #1a2e4a;
-      --blue: #2d7dd2;
-      --sky: #5ba4e5;
-      --light: #f4f8fc;
+      --navy: #1e2d4a;
+      --blue: #1e2d4a;
+      --sky: #f5b800;
+      --light: #f4f7fa;
       --white: #ffffff;
       --text: #2c3e50;
       --muted: #6b8299;
       --border: #d0dce8;
-      --accent: #e8f2fb;
+      --accent: #f0f4f8;
     }
 
     html, body {
@@ -65,7 +65,7 @@
     .launch-tag {
       display: inline-block; font-size: 0.6rem;
       letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--sky); border: 1px solid rgba(93,164,229,0.4);
+      color: #f5b800; border: 1px solid rgba(245,184,0,0.4);
       padding: 0.25rem 0.8rem; border-radius: 20px;
       margin-bottom: 1rem; position: relative;
     }
@@ -119,17 +119,17 @@
 
     .launch-btn {
       display: flex; align-items: center; justify-content: center; gap: 0.6rem;
-      background: var(--blue); color: white;
+      background: var(--navy); color: white;
       font-family: 'Lato', sans-serif; font-weight: 700;
       font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase;
       border: none; border-radius: 6px;
       width: 100%; padding: 1rem;
       cursor: pointer;
       transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 16px rgba(45,125,210,0.3);
+      box-shadow: 0 4px 16px rgba(30,45,74,0.25);
     }
 
-    .launch-btn:hover { background: #2568b8; transform: translateY(-1px); }
+    .launch-btn:hover { background: #2a3d60; transform: translateY(-1px); }
     .launch-btn:active { transform: translateY(0); }
     .launch-btn svg { width: 18px; height: 18px; }
 
@@ -171,15 +171,15 @@
 
     .ar-badge {
       font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
-      color: #5ba4e5; background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(93,164,229,0.3);
+      color: #f5b800; background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(245,184,0,0.4);
       padding: 0.2rem 0.6rem; border-radius: 3px;
       font-family: 'Lato', sans-serif;
     }
 
     .ar-hint {
       position: absolute; bottom: 5.5rem; left: 50%; transform: translateX(-50%);
-      background: rgba(26,46,74,0.85); border: 1px solid rgba(93,164,229,0.3);
+      background: rgba(30,45,74,0.9); border: 1px solid rgba(245,184,0,0.3);
       border-radius: 20px; padding: 0.5rem 1.2rem;
       font-size: 0.72rem; color: rgba(255,255,255,0.9);
       white-space: nowrap; text-align: center;
@@ -190,7 +190,7 @@
 
     .ar-exit {
       position: absolute; bottom: 1.5rem; right: 1.2rem;
-      background: rgba(26,46,74,0.85); border: 1px solid rgba(93,164,229,0.3);
+      background: rgba(30,45,74,0.9); border: 1px solid rgba(245,184,0,0.3);
       color: white; border-radius: 6px;
       font-family: 'Lato', sans-serif; font-weight: 700;
       font-size: 0.72rem; letter-spacing: 0.05em;
@@ -219,9 +219,9 @@
 
   <!-- Not Android -->
   <div id="not-android">
-    <img src="https://www.chaberton.com/wp-content/smush-webp/2024/07/chaberton-energy.png.webp"
+    <img src="chaberton-energy.webp"
          alt="Chaberton Energy" style="height:40px; width:auto; margin-bottom:0.5rem;"
-         onerror="this.style.display='none'" />
+          />
     <h2>Android Required</h2>
     <p>This AR experience requires Chrome on an Android device with ARCore support.<br><br>
       <a href="index.html">← Back to project page</a></p>
@@ -231,9 +231,9 @@
   <div id="launch">
     <div class="launch-header">
       <a href="index.html" class="back-link">← Back</a>
-      <img src="https://www.chaberton.com/wp-content/smush-webp/2024/07/chaberton-energy.png.webp"
+      <img src="chaberton-energy.webp"
            alt="Chaberton Energy" style="height:28px; width:auto;"
-           onerror="this.style.display='none'" />
+            />
       <div style="width:48px;"></div>
     </div>
 
@@ -282,9 +282,9 @@
   <!-- AR Overlay UI -->
   <div id="ar-ui">
     <div class="ar-topbar">
-      <img src="https://www.chaberton.com/wp-content/smush-webp/2024/07/chaberton-energy.png.webp"
+      <img src="chaberton-energy.webp"
            alt="Chaberton Energy" class="ar-logo"
-           onerror="this.style.display='none'" />
+            />
       <span class="ar-badge">● LIVE AR</span>
     </div>
     <div class="ar-hint" id="ar-hint">Drag to move · Twist to rotate</div>
