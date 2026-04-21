@@ -258,7 +258,7 @@
   </main>
 
   <footer>
-    <p>© 2026 <a href="https://www.chaberton.com" target="_blank">Chaberton Energy</a> · Butterfield BESS Site · Confidential · <strong style="color:var(--navy);">v15</strong> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="text-decoration:none;"><img src="eric.png" alt="" style="height:3.5em; width:auto; vertical-align:middle; display:inline;" /></a></p>
+    <p>© 2026 <a href="https://www.chaberton.com" target="_blank">Chaberton Energy</a> · Butterfield BESS Site · Confidential · <strong style="color:var(--navy);">v16</strong> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="text-decoration:none;"><img src="eric.png" alt="" style="height:3.5em; width:auto; vertical-align:middle; display:inline;" /></a></p>
   </footer>
 
 
@@ -275,8 +275,9 @@
 
   document.getElementById('ar-btn').addEventListener('click', () => {
     const glbUrl = 'https://flalabs2021-dev.github.io/AR-Viewer/Butterfield%20BESS%20Site%20FINAL.glb';
-    const fallback = 'https://arvr.google.com/scene-viewer?file=' + glbUrl + '&mode=ar_preferred&resizable=false&title=Butterfield%20BESS%20Site';
-    const intent = 'intent://arvr.google.com/scene-viewer/1.0?file=' + glbUrl + '&mode=ar_preferred&resizable=false&title=Butterfield%20BESS%20Site#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=' + encodeURIComponent(fallback) + ';end;';
+    const params = '&mode=ar_only&resizable=false&title=Butterfield%20BESS%20Site';
+    const fallback = 'https://arvr.google.com/scene-viewer?file=' + glbUrl + params;
+    const intent = 'intent://arvr.google.com/scene-viewer/1.0?file=' + glbUrl + params + '#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=' + encodeURIComponent(fallback) + ';end;';
     window.location.href = intent;
   });
 </script>
