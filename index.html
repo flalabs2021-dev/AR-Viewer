@@ -208,7 +208,8 @@
       </div>
 
       <div class="card-body">
-        <div class="steps">
+        <!-- Android steps -->
+        <div class="steps" id="android-steps">
           <div class="step">
             <div class="step-num">1</div>
             <div class="step-text"><strong>Move your phone around</strong> pointing at the ground until a <strong style="color:#f5b800;">yellow target</strong> appears. Point the target at your ground marker, then <strong>tap</strong> to lock the model location</div>
@@ -219,6 +220,26 @@
           </div>
           <div class="step">
             <div class="step-num">3</div>
+            <div class="step-text"><strong>Walk around</strong> freely to inspect the site at full scale</div>
+          </div>
+        </div>
+
+        <!-- iOS steps -->
+        <div class="steps" id="ios-steps" style="display:none;">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text"><strong>Face the same direction</strong> as the marker on the ground before opening AR Experience</div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text"><strong>Move your phone around</strong> pointing at the ground about 10' in front of you until the model drops into place</div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text"><strong>Click and drag</strong> the model to align the red marker with the real-world marker <em>(Hint: It's probably on the ground to your left)</em></div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
             <div class="step-text"><strong>Walk around</strong> freely to inspect the site at full scale</div>
           </div>
         </div>
@@ -258,7 +279,7 @@
   </main>
 
   <footer>
-    <p>© 2026 <a href="https://www.chaberton.com" target="_blank">Chaberton Energy</a> · Butterfield BESS Site · Confidential · <strong style="color:var(--navy);">v21</strong> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="text-decoration:none;"><img src="eric.png" alt="" style="height:3.5em; width:auto; vertical-align:middle; display:inline;" /></a></p>
+    <p>© 2026 <a href="https://www.chaberton.com" target="_blank">Chaberton Energy</a> · Butterfield BESS Site · Confidential · <strong style="color:var(--navy);">v22</strong> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="text-decoration:none;"><img src="eric.png" alt="" style="height:3.5em; width:auto; vertical-align:middle; display:inline;" /></a></p>
   </footer>
 
 
@@ -298,10 +319,14 @@
     document.getElementById('ar-btn').style.display = 'flex';
     document.getElementById('non-android-msg').style.display = 'none';
     document.getElementById('android-note').style.display = 'block';
+    document.getElementById('ios-steps').style.display = 'none';
+    document.getElementById('android-steps').style.display = 'block';
   } else if (isIOS) {
     document.getElementById('ios-btn').style.display = 'flex';
     document.getElementById('non-android-msg').style.display = 'none';
     document.getElementById('ios-note').style.display = 'block';
+    document.getElementById('android-steps').style.display = 'none';
+    document.getElementById('ios-steps').style.display = 'block';
   }
 
   const mv = document.getElementById('mv');
